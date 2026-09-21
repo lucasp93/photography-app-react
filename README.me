@@ -1,0 +1,128 @@
+# Photography App
+
+A full-stack photography booking platform built with React + Vite on the frontend and Django REST Framework on the backend.
+
+## Overview
+
+This project includes:
+- user registration and login
+- photo and album management
+- order creation and tracking
+- email-based contact workflow
+- JWT-based authentication
+
+## Tech stack
+
+Frontend:
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+
+Backend:
+- Python 3.13+
+- Django 6
+- Django REST Framework
+- PostgreSQL
+- SimpleJWT
+
+## Quick start
+
+### 1) Clone and enter the project
+
+```bash
+git clone <repository-url>
+cd photography-app-react
+```
+
+### 2) Start the database
+
+```bash
+cd backend
+docker compose up -d
+```
+
+### 3) Install backend dependencies
+
+```bash
+cd backend
+uv sync
+```
+
+### 4) Run database migrations
+
+```bash
+cd backend
+uv run python manage.py migrate
+```
+
+### 5) Start the backend
+
+```bash
+cd backend
+uv run python manage.py runserver 0.0.0.0:8000
+```
+
+### 6) Install frontend dependencies
+
+```bash
+cd frontend
+npm install
+```
+
+### 7) Start the frontend
+
+```bash
+cd frontend
+npm run dev
+```
+
+The frontend will run at http://localhost:5173 and the backend at http://127.0.0.1:8000.
+
+## Project structure
+
+```text
+photography-app-react/
+├── backend/               # Django REST API
+├── frontend/              # React + TypeScript app
+├── README.md              # full project documentation
+├── README.me              # repository-facing summary
+├── LICENSE
+└── .gitignore
+```
+
+## Environment variables
+
+If you want to use the email functionality, create a `.env` file inside the `frontend` directory:
+
+```env
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_CLIENT_TEMPLATE_ID=your_client_template_id
+VITE_EMAILJS_ADMIN_TEMPLATE_ID=your_admin_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+## Testing
+
+Backend:
+
+```bash
+cd backend
+uv run pytest
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run build
+npm run lint
+```
+
+## Notes
+
+- The backend uses PostgreSQL locally via Docker.
+- Authentication is handled with JWT tokens.
+- API routes are served under `/api/...`.
+- This README is intended as a repository-facing summary; the detailed docs live in [README.md](README.md).
