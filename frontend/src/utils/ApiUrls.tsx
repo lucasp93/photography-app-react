@@ -1,0 +1,18 @@
+export const ApiUrls = {
+    createPhoto: '/api/photos/',
+    getPhotos: '/api/photos/',
+    getPhoto: '/api/photos/:id',
+    updatePhoto: '/api/photos/:id',
+    createAlbum: '/api/albums/',
+    getAlbums: '/api/albums/',
+    getAlbum: '/api/albums/:id',
+    updateAlbum: '/api/albums/:id',
+    createOrder: '/api/orders/',
+    getOrders: '/api/orders/',
+    getOrder: '/api/orders/:id',
+    updateOrder: '/api/orders/:id',
+    createUser: '/api/users/',
+    getUsers: '/api/users/',
+    getUser: '/api/users/:id',
+    updateUser: '/api/users/:id',
+}

@@ -2,7 +2,7 @@ from django.db import models
 
 class Album(models.Model):
     EVENT_CHOICES = (
-        ("wedding", "Wedding"),
+        ("weddings", "Weddings"),
         ("birthday", "Birthday"),
         ("family", "Family"),
         ("business", "Business"),

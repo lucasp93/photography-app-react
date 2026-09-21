@@ -1,7 +1,11 @@
 :root {
+  /* Tailwind directives: inject base, components, and utilities */
+}
+@tailwind utilities;
+:root {
   --text: #6b6375;
   --text-h: #08060d;
-  --bg: #fff;
+  --bg: #f2f2f2;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
   --accent: #aa3bff;
@@ -30,7 +34,7 @@
   }
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
     --text-h: #f3f4f6;
@@ -48,10 +52,11 @@
   #social .button-icon {
     filter: invert(1) brightness(2);
   }
-}
+} */
 
 #root {
-  width: 1126px;
+  /* width: 1126px; */
+  width: auto;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;

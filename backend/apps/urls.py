@@ -7,10 +7,12 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     # JWT Auth Endpoints
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
+    # Endpoint to get the access and refresh token (login)
+    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # Endpoint to get a new access token using a refresh token
+    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 
     # App Endpoints
-    path("api/users/", include("apps.users.urls")),
+    path("users/", include("apps.users.urls")),
 ]

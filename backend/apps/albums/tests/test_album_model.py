@@ -1,7 +1,8 @@
 import pytest
-from apps.albums.models import Album
 from django.db import IntegrityError
 from django.utils import timezone
+
+from apps.albums.models import Album
 
 
 # Fixtures (reusable test setup data)
