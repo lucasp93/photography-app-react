@@ -1,75 +1,83 @@
-# React + TypeScript + Vite
+# Photography App Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript frontend for the photography application.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+This frontend provides the user-facing interface for:
+- user signup and login
+- browsing albums and photos
+- creating and viewing orders
+- managing shopping/cart flows
+- contact and email submission
 
-## React Compiler
+## Tech stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- React Router
+- Tailwind CSS
+- Material UI helpers
+- EmailJS
 
-## Expanding the ESLint configuration
+## Local setup
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1) Install dependencies
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2) Start the app
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run dev
 ```
+
+The frontend usually runs at:
+- `http://localhost:5173`
+
+## Environment variables
+
+Create a `.env` file in this folder if you want to enable the email contact flow:
+
+```env
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_CLIENT_TEMPLATE_ID=your_client_template_id
+VITE_EMAILJS_ADMIN_TEMPLATE_ID=your_admin_template_id
+VITE_EMAILJS_PUBLIC_KEY=your_public_key
+```
+
+If the app is using a backend API, make sure the Django server is running before testing the UI.
+
+## Available scripts
+
+```bash
+npm run dev     # start Vite dev server
+npm run build   # type-check and build production bundle
+npm run lint    # run ESLint
+npm run preview # preview the built app locally
+```
+
+## Notes
+
+- The frontend expects the backend API under `/api/...`.
+- Authentication tokens are stored in `localStorage`.
+- API requests are centralized in the frontend service layer to handle JWT refresh logic.
+
+## Troubleshooting
+
+If the app does not load or API calls fail:
+
+1. confirm the backend is running on port 8000
+2. check browser devtools for network or CORS errors
+3. verify the `.env` values for EmailJS are populated only if email features are used
+
+## Production build
+
+```bash
+npm run build
+```
+
+This produces a production bundle in the `dist/` directory.
