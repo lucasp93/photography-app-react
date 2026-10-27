@@ -10,18 +10,22 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
+import os
 from datetime import timedelta
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g=7bkpxglutmc-9s22o+@3mgqm2=p$jyj%yodst$o6v+te^7zb'
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-local-development-key")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -46,6 +50,7 @@ INSTALLED_APPS = [
     'apps.albums',
     'apps.orders',
     'apps.photos',
+    'anymail',
 ]
 
 # Set DRF to use SimpleJWT by default
@@ -113,11 +118,11 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'photography_db',
-        'USER': 'postgres',
-        'PASSWORD': 'lucas123',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('POSTGRES_DB', 'photography_db'),
+        'USER': os.getenv('POSTGRES_USER', 'postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'lucas123'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',
@@ -161,6 +166,31 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "false").lower() == "true"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = (
+#     "django.core.mail.backends.smtp.EmailBackend"
+#     if EMAIL_HOST
+#     else "django.core.mail.backends.console.EmailBackend"
+# )
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+# Anymail settings
+ANYMAIL = {
+    "RESEND_API_KEY": os.getenv("RESEND_API_KEY", ""),
+}
+
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 
 # For local development
 CORS_ALLOW_ALL_ORIGINS = True

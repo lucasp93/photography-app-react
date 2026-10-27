@@ -1,18 +1,20 @@
-import auth from './auth';
+import auth, { getAccessToken } from './auth';
 
 let isRefreshing = false;
-let refreshPromise: Promise<string> | null = null;
+let refreshPromise: Promise<boolean> | null = null;
 
 // Helper function to refresh expired access token
-async function refreshAccessToken(): Promise<string | null> {
+async function refreshAccessToken(): Promise<boolean> {
   const refreshToken = auth.getRefreshToken();
-  if (!refreshToken) return null;
+  if (!refreshToken) return false;
 
   try {
-    return await auth.refreshToken();
+    await auth.refreshToken();
+    //return getAccessToken();
+    return true;
   } catch (err) {
     console.error('Failed to refresh token: ', err);
-    return null;
+    return false;
   }
 }
 
@@ -39,21 +41,20 @@ export async function apiFetch(url: string, options: RequestInit = {}) {
 }
 
 // other authentication methods
-async function doRefresh(): Promise<string> {
+async function doRefresh(): Promise<boolean> {
   if (isRefreshing && refreshPromise) return refreshPromise;
   isRefreshing = true;
   refreshPromise = auth.refreshToken()
-    .then((token) => {
+    .then(() => {
       isRefreshing = false;
-      refreshPromise = null;
-      return token;
+      return true;
     })
     .catch((err) => {
       isRefreshing = false;
       refreshPromise = null;
       throw err;
     });
-  return refreshPromise;
+  return true;
 }
 
 async function getRefreshedToken(): Promise<string> {
@@ -62,23 +63,23 @@ async function getRefreshedToken(): Promise<string> {
       refreshPromise = null;
     });
   }
-  return refreshPromise;
+  await refreshPromise;
+  const accessToken = getAccessToken();
+  if (!accessToken) throw new Error('No access token after refresh');
+  return accessToken;
 }
 
 export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
   const method = (init.method || 'GET').toUpperCase();
-  let access = auth.getAccessToken();
+  const access = auth.getAccessToken();
 
-  if (!access) {
-    const username = import.meta.env.VITE_DJANGO_USER;
-    const password = import.meta.env.VITE_DJANGO_PASSWORD;
-    const response = await auth.login(username, password);
-    access = response.access;
-  }
-
-  const createHeaders = (token: string): Headers => {
+  const createHeaders = (token: string | null): Headers => {
     const h = new Headers(init.headers || {});
-    h.set('Authorization', `Bearer ${token}`);
+    if (token) {
+      h.set('Authorization', `Bearer ${token}`);
+    } else {
+      h.delete('Authorization');
+    }
     if (!h.has('Accept')) {
       h.set('Accept', 'application/json');
     }
@@ -134,8 +135,8 @@ export async function apiPut<T = any>(path: string, body: any): Promise<T> {
   return text ? (JSON.parse(text) as T) : (null as any);
 }
 
-export async function apiDelete<T = any>(path: string, id: string): Promise<T> {
-  const res = await authFetch(`${path}/${id}`, {
+export async function apiDelete<T = any>(path: string, id: number): Promise<T> {
+  const res = await authFetch(`${path}/${id}/`, {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -145,4 +146,4 @@ export async function apiDelete<T = any>(path: string, id: string): Promise<T> {
   return text ? (JSON.parse(text) as T) : (null as any);
 }
 
-export default { authFetch, apiGet, apiPost, apiPut };
+export default { authFetch, apiGet, apiPost, apiPut, apiDelete };

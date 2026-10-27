@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserPlus, CheckCircle2 } from 'lucide-react';
+// Import your icons or MUI equivalents here:
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
 import { createUser } from '../services/utils';
 import type { User } from '../interfaces/interfaces';
 
@@ -18,7 +22,15 @@ export const SignUpPage: React.FC = () => {
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+    // 1. Separate states to toggle visibility for each field
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
+
+    // Track whether user interacted with confirmPassword field
+    const [confirmPasswordTouched, setConfirmPasswordTouched] = useState<boolean>(false);
+
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState<SignUpFormData>({
@@ -30,6 +42,12 @@ export const SignUpPage: React.FC = () => {
         lastName: '',
         role: '',
     });
+
+    // Check if passwords mismatch after input is blurred or form is submitted
+    const isPasswordMismatch =
+        confirmPasswordTouched &&
+        formData.confirmPassword.length > 0 &&
+        formData.password !== formData.confirmPassword;
 
     // Handle typed input changes
     const handleChange = (
@@ -44,9 +62,18 @@ export const SignUpPage: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setConfirmPasswordTouched(true);
+
+        if (formData.password !== formData.confirmPassword) {
+            setStatus('error');
+            setIsSubmitting(false);
+            setErrorMessage('Passwords do not match');
+            return;
+        }
+
         setIsSubmitting(true);
-        // TODO: add login logic, change isSubmitted state
         setStatus('loading');
+
         const userData: User = {
             email: formData.email,
             username: formData.username,
@@ -64,8 +91,9 @@ export const SignUpPage: React.FC = () => {
             navigate('/login');
         } else {
             setStatus('error');
+            setIsSubmitting(false);
         }
-    }
+    };
 
     return (
         <div>
@@ -78,7 +106,7 @@ export const SignUpPage: React.FC = () => {
                             <UserPlus className="w-10 h-10 text-neutral-400" />
                         </div>
                         <h2 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
-                            Crate Account
+                            Create Account
                         </h2>
                     </div>
 
@@ -93,6 +121,7 @@ export const SignUpPage: React.FC = () => {
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {/* Username */}
                                         <div>
                                             <label htmlFor="username" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
                                                 Username
@@ -108,6 +137,7 @@ export const SignUpPage: React.FC = () => {
                                                 className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
                                             />
                                         </div>
+
                                         {/* Email */}
                                         <div>
                                             <label htmlFor="email" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
@@ -125,41 +155,84 @@ export const SignUpPage: React.FC = () => {
                                             />
                                         </div>
 
-                                        {/* Password */}
+                                        {/* Password Input with Eye Icon */}
                                         <div>
                                             <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
                                                 Password
                                             </label>
-                                            <input
-                                                type="password"
-                                                id="password"
-                                                name="password"
-                                                required
-                                                value={formData.password}
-                                                onChange={handleChange}
-                                                placeholder="Password"
-                                                className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
-                                            />
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    id="password"
+                                                    name="password"
+                                                    required
+                                                    value={formData.password}
+                                                    onChange={handleChange}
+                                                    placeholder="Password"
+                                                    className="w-full bg-neutral-100 border border-neutral-800 rounded-lg pl-4 pr-10 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword((prev) => !prev)}
+                                                    className="absolute right-3 focus:outline-none p-1 hover:opacity-80 transition"
+                                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                                >
+                                                    {showPassword ? (
+                                                        <RemoveRedEyeIcon className="w-4 h-4 text-neutral-400 block" />
+                                                    ) : (
+                                                        <VisibilityOffIcon className="w-4 h-4 text-neutral-400 block" />
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
-                                        {/* Confirm Password */}
+
+                                        {/* Confirm Password Input with Eye Icon */}
                                         <div>
-                                            <label htmlFor="confirmpassword" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
+                                            <label
+                                                htmlFor="confirmPassword"
+                                                className={`block text-xs uppercase tracking-widest mb-2 transition ${isPasswordMismatch ? 'text-red-500' : 'text-neutral-600'
+                                                    }`}
+                                            >
                                                 Confirm Password
                                             </label>
-                                            <input
-                                                type="password"
-                                                id="confirmPassword"
-                                                name="confirmPassword"
-                                                required
-                                                value={formData.confirmPassword}
-                                                onChange={handleChange}
-                                                placeholder="Confirm Password"
-                                                className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
-                                            />
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    id="confirmPassword"
+                                                    name="confirmPassword"
+                                                    required
+                                                    value={formData.confirmPassword}
+                                                    onChange={handleChange}
+                                                    onBlur={() => setConfirmPasswordTouched(true)}
+                                                    placeholder="Confirm Password"
+                                                    className={`w-full bg-neutral-100 rounded-lg pl-4 pr-10 py-3 text-sm placeholder-neutral-600 focus:outline-none transition ${isPasswordMismatch
+                                                            ? 'border-2 border-red-500 text-red-500 focus:border-red-500'
+                                                            : 'border border-neutral-800 text-neutral-500 focus:border-neutral-500'
+                                                        }`}
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                                    className="absolute right-3 focus:outline-none p-1 hover:opacity-80 transition"
+                                                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                                                >
+                                                    {showConfirmPassword ? (
+                                                        <RemoveRedEyeIcon className="w-4 h-4 text-neutral-400 block" />
+                                                    ) : (
+                                                        <VisibilityOffIcon className="w-4 h-4 text-neutral-400 block" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                            {isPasswordMismatch && (
+                                                <p className="text-xs text-red-500 mt-1">
+                                                    Passwords do not match.
+                                                </p>
+                                            )}
                                         </div>
+
                                         {/* First Name */}
                                         <div>
-                                            <label htmlFor="firstname" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
+                                            <label htmlFor="firstName" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
                                                 First Name
                                             </label>
                                             <input
@@ -169,13 +242,14 @@ export const SignUpPage: React.FC = () => {
                                                 required
                                                 value={formData.firstName}
                                                 onChange={handleChange}
-                                                placeholder="Frist Name"
+                                                placeholder="First Name"
                                                 className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
                                             />
                                         </div>
+
                                         {/* Last Name */}
                                         <div>
-                                            <label htmlFor="lastname" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
+                                            <label htmlFor="lastName" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
                                                 Last Name
                                             </label>
                                             <input
@@ -190,6 +264,7 @@ export const SignUpPage: React.FC = () => {
                                             />
                                         </div>
                                     </div>
+
                                     {/* Submit Button */}
                                     <button
                                         type="submit"
@@ -201,20 +276,16 @@ export const SignUpPage: React.FC = () => {
                                         ) : (
                                             <div className="flex items-center justify-center space-x-2 w-full">
                                                 <span>Create Account</span>
-                                                {/* <LogIn className="w-4 h-4" /> */}
                                             </div>
                                         )}
                                     </button>
-                                    {/* <div>
-                                        <p className="text-xs text-neutral-500 mt-2">Don't have an account? <a href="/signup" className="text-neutral-600 hover:text-neutral-700 transition">Sign up</a></p>
-                                    </div> */}
+                                    {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
                                 </form>
                             )}
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
     );
-}
+};

@@ -8,9 +8,7 @@ import Typography from '@mui/material/Typography';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import CameraIcon from '@mui/icons-material/Camera';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -128,6 +126,9 @@ export const MainHeader: React.FC = () => {
             case 'Photos':
                 navigate('/photos');
                 break;
+            case 'Orders':
+                navigate('/orders');
+                break;
             case 'Logout':
                 navigate('/login');
                 break;
@@ -140,14 +141,16 @@ export const MainHeader: React.FC = () => {
         <AppBar position="static">
             <Container maxWidth="xl">
                 <Toolbar disableGutters>
-                    <CameraIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-                    <Typography
+                    <IconButton size="medium" onClick={() => navigate('/')} color="inherit" title="Home">
+                        <CameraIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                    </IconButton>
+                    {/* <Typography
                         variant="h6"
                         component="div"
                         onClick={() => navigate('/')}
                         sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}>
                         Home
-                    </Typography>
+                    </Typography> */}
 
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton size="large" onClick={handleOpenNavMenu} color="inherit"><MenuIcon /></IconButton>

@@ -16,6 +16,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     # Enable buit-in search and ordering
     filter_backends = [SearchFilter, OrderingFilter]
+    filterset_fields = ["order_number", "client_name", "client_email"]
     search_fields = ["order_number", "client_name", "client_email"]
     ordering_fields = ["created_at", "price"]
 

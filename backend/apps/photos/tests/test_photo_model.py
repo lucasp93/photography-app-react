@@ -3,6 +3,7 @@ from django.db import IntegrityError
 from django.utils import timezone
 from apps.photos.models import Photo
 from apps.albums.models import Album
+from apps.orders.models import Order
 
 def test_create_photo_with_required_album(db):
     album = Album.objects.create(
@@ -32,6 +33,33 @@ def test_photo_creation_fails_without_album(db):
             url="https://picsum.photos/id/231/1200/800.jpg",
             album=None,
         )
+
+def test_photo_can_belong_to_multiple_orders_and_survives_order_deletion(db):
+    album = Album.objects.create(name="Album", event="wedding", author="Alex")
+    photo = Photo.objects.create(
+        name="Portrait",
+        author="Alex",
+        url="https://example.com/portrait.jpg",
+        album=album,
+    )
+    first_order = Order.objects.create(
+        client_name="Client One",
+        client_email="one@example.com",
+        client_contact="+14155552671",
+        price="10.00",
+    )
+    second_order = Order.objects.create(
+        client_name="Client Two",
+        client_email="two@example.com",
+        client_contact="+14155552672",
+        price="10.00",
+    )
+    photo.orders.add(first_order, second_order)
+
+    first_order.delete()
+
+    assert Photo.objects.filter(pk=photo.pk).exists()
+    assert list(photo.orders.all()) == [second_order]
 
 def test_unique_photo_name_per_album_constrint(db):
     album1 = Album.objects.create(name="Album One", event="wedding", author="John")

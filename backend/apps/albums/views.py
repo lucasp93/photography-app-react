@@ -17,6 +17,7 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
     # Enable buit-in search and ordering
     filter_backends = [SearchFilter, OrderingFilter]
+    filterset_fields = ['name', 'event', 'author']
     search_fields = ['name', 'event', 'author']
     ordering_fields = ["created_at", "name"]
 

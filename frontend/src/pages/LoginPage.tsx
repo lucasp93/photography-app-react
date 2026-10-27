@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { User, CheckCircle2, LogIn } from 'lucide-react';
-
+import { getUserByEmail } from '../services/utils';
+//import { login } from '../services/auth';
+import { useAuth } from '../context/AuthContext';
 export interface LoginFormData {
     email: string;
     password: string;
@@ -9,8 +12,11 @@ export interface LoginFormData {
 export const LoginPage: React.FC = () => {
     const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { login } = useAuth();
 
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState<LoginFormData>({
         email: '',
@@ -32,7 +38,31 @@ export const LoginPage: React.FC = () => {
         e.preventDefault();
         setIsSubmitting(true);
         // TODO: add login logic, change isSubmitted state
+        const email = formData.email;
+        const password = formData.password;
+        let username = '';
+
+        const userData = await getUserByEmail(email);
+        if (!userData) {
+            throw new Error('Authenticated user was not found');
+        }
+
+        username = userData[0].username;
+        // Perform login
+        try {
+            const response = await login(username, password);
+            setStatus('success');
+            setIsSubmitted(true);
+            setIsSubmitting(false);
+            navigate('/');
+        } catch (err) {
+            console.error('Failed to login:', err);
+            setStatus('error');
+            setIsSubmitting(false);
+            setErrorMessage('Username or password is incorrect');
+        }
     }
+
 
     return (
         <div>
@@ -60,7 +90,7 @@ export const LoginPage: React.FC = () => {
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {/* Full Name */}
+                                        {/* Email */}
                                         <div>
                                             <label htmlFor="email" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
                                                 Email
@@ -77,7 +107,7 @@ export const LoginPage: React.FC = () => {
                                             />
                                         </div>
 
-                                        {/* Email */}
+                                        {/* Password */}
                                         <div>
                                             <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
                                                 Password
@@ -105,17 +135,25 @@ export const LoginPage: React.FC = () => {
                                         ) : (
                                             <div className="flex items-center justify-center space-x-2 w-full">
                                                 <span>Login</span>
-                                                <LogIn className="w-4 h-4"/>
+                                                <LogIn className="w-4 h-4" />
                                             </div>
                                         )}
                                     </button>
+                                    {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
+
                                     <div>
-                                        <p className="text-xs text-neutral-500 mt-2">Don't have an account? <a href="/signup" className="text-neutral-600 hover:text-neutral-700 transition">Sign up</a></p>
+                                        <a href="#" className="text-xs text-neutral-600 hover:text-neutral-700 transition mt-2" onClick={() => {
+                                            navigate('/password/reset');
+                                        }}>Forgot your password?</a>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-neutral-500 mt-2">Don't have an account? <a href="#" className="text-neutral-600 hover:text-neutral-700 transition" onClick={() => {
+                                            navigate('/signup');
+                                        }}>Sign up</a></p>
                                     </div>
                                 </form>
                             )}
                         </div>
-
                     </div>
                 </div>
             </div>

@@ -28,7 +28,7 @@ export const HomePage = () => {
     }, [fetchPhotos]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-items-center px-4 py-4 bg-gray-100">
             {/* Ensure w-full is explicit, remove invalid w-4xl, and add min-w-0 to prevent flex overflow */}
             <div className="w-full max-w-7xl min-w-0 px-4 py-8 mx-auto border-solid rounded-md bg-gray-200">
                 <PhotoCarousel

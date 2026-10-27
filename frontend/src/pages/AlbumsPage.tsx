@@ -9,6 +9,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Alert from 'react-bootstrap/Alert';
 import Button from '@mui/material/Button';
+import { useAuth } from '../context/AuthContext';
 
 
 export const AlbumPage: React.FC = () => {
@@ -18,6 +19,8 @@ export const AlbumPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     const navigate = useNavigate();
+
+    const { isAuthenticated, user } = useAuth();
 
     const fetchAlbums = useCallback(async () => {
         const url = event_name ? `${ApiUrls.getAlbums}?event=${event_name}` : ApiUrls.getAlbums;
@@ -52,7 +55,10 @@ export const AlbumPage: React.FC = () => {
             {/* <h4 className="mt-2 font-serif text-4l font-cursice text-center bg-transparent">{event_name?.toUpperCase()}</h4> */}
             <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
                 {/* <CardGroup className="flex flex-wrap justify-center gap-4"> */}
-                <Button variant="contained" className="block float-right mb-2" onClick={handleAddClick}>Add Album</Button>
+                {isAuthenticated && user?.role === 'admin' ?
+                    <Button variant="contained" className="block float-right mb-2" onClick={handleAddClick}>Add Album</Button>
+                    : null
+                }
                 <h4 className="mb-4 font-serif text-4l font-bold text-center bg-transparent">{event_name?.toUpperCase()}</h4>
                 {albums.length > 0 ?
                     <Row xs={1} md={4} className="g-4 justify-center">

@@ -53,7 +53,7 @@ export async function login(username: string, password: string): Promise<TokenPa
   return tokens;
 }
 
-export async function refreshToken(): Promise<string> {
+export async function refreshToken(): Promise<boolean> {
   const refresh = getRefreshToken();
   if (!refresh) throw new Error('No refresh token');
   const res = await fetch('/api/token/refresh/', {
@@ -71,7 +71,7 @@ export async function refreshToken(): Promise<string> {
   localStorage.setItem(ACCESS_KEY, access);
   // Some backends also return a new refresh token
   if (data.refresh) localStorage.setItem(REFRESH_KEY, data.refresh);
-  return access;
+  return true;
 }
 
 export default {

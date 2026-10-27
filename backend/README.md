@@ -30,7 +30,20 @@ From this directory:
 docker compose up -d
 ```
 
-This starts a local Postgres database using the credentials configured in the project settings.
+This starts PostgreSQL and Redis. Redis is the Celery message broker.
+
+### Configure email and Celery
+
+Copy `.env.example` to `.env` if needed, keep your existing database values, and set the SMTP values supplied by your email provider. Django uses the console email backend when `EMAIL_HOST` is blank; configure SMTP to deliver email to inboxes. Frontend EmailJS settings are separate and are not used by Django.
+
+Run these commands from the `backend` directory, in separate terminals:
+
+```bash
+uv run python manage.py runserver
+uv run celery -A core worker -l info
+```
+
+The worker must stay running to process queued password reset emails.
 
 ### 2) Install dependencies
 
@@ -54,6 +67,7 @@ uv run python manage.py migrate
 
 ```bash
 uv run python manage.py runserver 0.0.0.0:8000
+uv run uvicorn core.asgi:application --host 127.0.0.1 --port 8000 --reload
 ```
 
 The API will be available at:

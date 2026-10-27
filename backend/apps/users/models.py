@@ -24,6 +24,9 @@ class User(AbstractUser):
             "username": self.username,
             "role": self.role,
             "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "last_login": self.last_login.isoformat() if self.last_login else None,
             "created_at": self.created_at.isoformat(), # Include for consistency with serializer
             "updated_at": self.updated_at.isoformat(), # Include for consistency with serializer
         }
