@@ -72,7 +72,10 @@ export const PhotoListPage: React.FC = () => {
             featured: newItemFeatured,
             is_favorited: false,
             url: newItemUrl,
-            album: newItemAlbumId,
+            album_id: newItemAlbumId,
+            album: albums.find((album) => String(album.id) === newItemAlbumId) || null,
+            album_name: '',
+            size: '',
         };
 
         const response = await createPhoto(newItem);

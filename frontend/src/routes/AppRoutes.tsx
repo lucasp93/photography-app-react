@@ -30,11 +30,12 @@ function AppRoutes() {
             <Route path='/password/reset/confirm/:uid/:token' element={<ResetPasswordConfirmPage />} />
             <Route path='/password/reset' element={<ResetPasswordRequestPage />} />
             <Route path='/login' element={<LoginPage />} />
-            <Route path='/signup' element={<SignUpPage />} />            
+            <Route path='/signup' element={<SignUpPage />} />
+            <Route path='/checkout/cart' element={<CheckoutPage />} />      
             {/* Protected Routes Group */}
             {/* Unauthenticated users attempting to access any child route will be redirected to "/" */}
             <Route element={<ProtectedRoute redirectTo="/" />}>
-                <Route path='/checkout/cart' element={<CheckoutPage />} />
+                {/* <Route path='/checkout/cart' element={<CheckoutPage />} /> */}
                 <Route path='/albums' element={<AlbumListPage />} />
                 <Route path='/photos' element={<PhotoListPage />} />
                 <Route path='/users' element={<UserListPage />} />

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Camera, Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
 import { sendEmail } from '../services/utils';
-import type { EmailProps } from '../interfaces/interfaces';
 
 // Define the TypeScript interface for the form fields
 interface ContactFormData {

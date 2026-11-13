@@ -5,9 +5,12 @@ export interface Photo {
     author: string;
     featured: boolean;
     is_favorited: boolean;
+    album: Album | null;
     url: string;
     album_id: string | number;
     album_name: string;
+    album_author: string;
+    size: string; // New field for photo size
 }
 
 export interface Order {

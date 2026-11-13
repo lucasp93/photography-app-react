@@ -6,6 +6,7 @@ import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 // import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { PrintSizeModal } from './PrintSizeModal';
 import api from '../services/api';
 
 export interface PhotoCardProps {
@@ -55,6 +56,10 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
     }
   }
 
+  const handleCartIconClick = () => {
+    console.log('Cart icon clicked for photo ID:', photo?.id);
+  }
+
   useEffect(() => {
     setFavorited(isFavorited);
   }, [isFavorited]);
@@ -75,7 +80,7 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
         }
       </Card.Body>
       {showLinks ?
-        <Card.Body>
+        <Card.Body className="flex flex-row justify-center items-center">
           <IconButton size="medium" color="inherit" aria-label="Favourite" onClick={handleFavoriteToggle}>
             {favorited ?
               <FavoriteIcon />
@@ -83,7 +88,18 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
               <FavoriteBorderIcon />
             }
           </IconButton>
-          <IconButton size="medium" color="inherit" aria-label="Cart"><ShoppingBagIcon /></IconButton>
+          {photo ? (
+            <PrintSizeModal
+              key={photo.id}
+              photo={photo}
+              showAddToCartButton={true}
+              trigger={
+                <IconButton size="medium" color="inherit" aria-label="Cart">
+                  <ShoppingBagIcon />
+                </IconButton>
+              }
+            />
+          ) : null}
           {/* <Card.Link href="#">Card Link</Card.Link>
         <Card.Link href="#">Another Link</Card.Link> */}
         </Card.Body> : null

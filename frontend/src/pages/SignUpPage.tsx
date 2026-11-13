@@ -74,12 +74,16 @@ export const SignUpPage: React.FC = () => {
         setIsSubmitting(true);
         setStatus('loading');
 
+        const currentDate = new Date();
+
         const userData: User = {
+            id: Date.now(), // Temporary ID, replace with backend-generated ID
             email: formData.email,
             username: formData.username,
             password: formData.password,
             first_name: formData.firstName,
             last_name: formData.lastName,
+            last_login: currentDate.toISOString(),
             role: formData.role ? formData.role : 'user',
         };
 

@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.filters import OrderingFilter, SearchFilter
 from ..orders.models import Order
 from ..orders.serializers import OrderSerializer
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from ..tasks import send_order_confirmation_email
 
 
@@ -11,7 +12,10 @@ class OrderViewSet(viewsets.ModelViewSet):
     Order standard actions
     """
 
-    queryset = Order.objects.all()
+    permission_classes = [IsAuthenticated]
+
+
+    queryset = Order.objects.all().order_by("id")
     serializer_class = OrderSerializer
 
     # Enable buit-in search and ordering
@@ -20,8 +24,14 @@ class OrderViewSet(viewsets.ModelViewSet):
     search_fields = ["order_number", "client_name", "client_email"]
     ordering_fields = ["created_at", "price"]
 
+    def get_permissions(self):
+        # Allow anyoneto create an order (guess checkout)
+        if self.action == 'create':
+            return [AllowAny()]
+        return [IsAdminUser()]
+
     def get_queryset(self):
-        queryset = Order.objects.all().order_by("id")
+        queryset = super().get_queryset()
         order_number = self.request.query_params.get("order_number")
         client_name = self.request.query_params.get("client_name")
         client_email = self.request.query_params.get("client_email")
@@ -33,7 +43,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(client_email=client_email)
         return queryset
 
-    def perform_create(saelf, serializer):
+    def perform_create(self, serializer):
         # Save the order instance to the database
         order = serializer.save()
 

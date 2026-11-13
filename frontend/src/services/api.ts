@@ -88,7 +88,6 @@ export async function authFetch(input: RequestInfo, init: RequestInit = {}) {
 
   const initialReq = input instanceof Request ? input.clone() : input;
   const response = await fetch(initialReq, { ...init, headers: createHeaders(access) });
-
   const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method);
   if (response.status !== 401 || !auth.getRefreshToken() || isMutation) {
     return response;
@@ -118,6 +117,7 @@ export async function apiPost<T = any>(path: string, body: any): Promise<T> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
+
   if (!res.ok) throw new Error(`Request failed: ${res.status}`);
   const text = await res.text();
   return text ? (JSON.parse(text) as T) : (null as any);

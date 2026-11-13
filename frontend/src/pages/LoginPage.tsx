@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, CheckCircle2, LogIn } from 'lucide-react';
 import { getUserByEmail } from '../services/utils';
-//import { login } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
+import Alert from '@mui/material/Alert';
+
 export interface LoginFormData {
     email: string;
     password: string;
@@ -89,6 +90,7 @@ export const LoginPage: React.FC = () => {
                                 </div>
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
+                                    {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         {/* Email */}
                                         <div>
@@ -139,8 +141,6 @@ export const LoginPage: React.FC = () => {
                                             </div>
                                         )}
                                     </button>
-                                    {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
-
                                     <div>
                                         <a href="#" className="text-xs text-neutral-600 hover:text-neutral-700 transition mt-2" onClick={() => {
                                             navigate('/password/reset');

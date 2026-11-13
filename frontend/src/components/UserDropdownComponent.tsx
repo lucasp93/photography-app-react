@@ -15,7 +15,7 @@ import { DrawerContent } from './DrawerContent';
 
 export const UserDropdownComponent: React.FC = () => {
     const adminSettings = ['Users', 'Albums', 'Photos', 'Orders', 'Login', 'Logout'];
-    const userSettings = ['Favourites', 'Orders', 'Logout'];
+    const userSettings = ['Favourites', 'Logout'];
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElUser(event.currentTarget);
 
@@ -27,7 +27,6 @@ export const UserDropdownComponent: React.FC = () => {
 
     const handleUserMenuClick = (setting: string) => {
         handleCloseUserMenu();
-        console.log('menu setting: ', setting)
         switch (setting) {
             case 'Users':
                 navigate('/users');

@@ -1,22 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
 import type { Order } from '../interfaces/interfaces';
-import { Table, Button, Form, Card, Row, Col, Pagination, Toast } from 'react-bootstrap';
+import { Table, Button, Form, Card, Row, Col, Pagination } from 'react-bootstrap';
 import api from '../services/api';
 import { createOrder, deleteItem } from '../services/utils';
-import ImageIcon from '@mui/icons-material/Image';
+import { PhotoListModal } from '../components/PhotoListModal';
 
 export const OrderListPage: React.FC = () => {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [error, setError] = useState<string | null>(null);
     const [items, setItems] = useState<Order[]>([]);
-
-    // Toast State
-    const [showA, setShowA] = useState(true);
-    const [showB, setShowB] = useState(true);
-
-    const toggleShowA = () => setShowA(!showA);
-    const toggleShowB = () => setShowB(!showB);
 
     // 1. Pagination State
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -192,73 +185,9 @@ export const OrderListPage: React.FC = () => {
 
     if (status === 'loading') return <p>Loading items...</p>;
     if (status === 'error') return <p>Error: {error}</p>;
-
+    console.log('items: ', items);
     return (
         <div className="container py-4">
-            <Card className="shadow-sm mb-4">
-                <Card.Body>
-                    <Card.Title className="mb-3">Add New Order</Card.Title>
-                    {/* Add Item Form */}
-                    <Form onSubmit={handleAddItem}>
-                        <Row className="g-3 align-items-end">
-                            <Col md={4}>
-                                <Form.Group controlId="itemClientName">
-                                    <Form.Label>Client</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder="e.g. John's Wedding"
-                                        value={newItemClientName}
-                                        onChange={(e) => setNewItemClientName(e.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={4}>
-                                <Form.Group controlId="itemClientContact">
-                                    <Form.Label>Contact</Form.Label>
-                                    <Form.Control
-                                        type="phone"
-                                        placeholder="e.g. +14155552671"
-                                        value={newItemClientContact}
-                                        onChange={(e) => setNewItemClientContact(e.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={4}>
-                                <Form.Group controlId="ItemClientEmail">
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        type="email"
-                                        placeholder="e.g. john@example.com"
-                                        value={newItemClientEmail}
-                                        onChange={(e) => setNewItemClientEmail(e.target.value)}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={4}>
-                                <Form.Group controlId="ItemPrice">
-                                    <Form.Label>Price</Form.Label>
-                                    <Form.Control
-                                        type="float"
-                                        placeholder="e.g. 10.00"
-                                        value={newItemPrice}
-                                        onChange={(e) => setNewItemPrice(Number(e.target.value))}
-                                        required
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={3} className="align-center justify-center">
-                                <Button variant="primary" type="submit" className="w-100" onClick={handleAddItem}>
-                                    + Add Item
-                                </Button>
-                            </Col>
-                        </Row>
-                    </Form>
-                </Card.Body>
-            </Card>
-
             {/* React Bootstrap Table */}
             <Card className="shadow-sm">
                 <Card.Header className="bg-white py-3">
@@ -304,14 +233,14 @@ export const OrderListPage: React.FC = () => {
                         </thead>
                         <tbody>
                             {items.length === 0 ? (
-                                <tr>
+                                <tr key="noorders-1">
                                     <td colSpan={5} className="text-center text-muted py-4">
                                         No orders found.
                                     </td>
                                 </tr>
                             ) : (
                                 currentItems.map((item, index) => (
-                                    <tr key={item.id}>
+                                    <tr key={item.order_number}>
                                         <td>{indexOfFirstItem + index + 1}</td>
                                         <td>{item.order_number ?? '—'}</td>
                                         <td>{item.client_name ?? '—'}</td>
@@ -321,21 +250,7 @@ export const OrderListPage: React.FC = () => {
                                         <td>
                                             <Row className="align-items-center justify-content-center mt-2">
                                                 <Col md={6} className="mb-2">
-                                                    <Button onClick={toggleShowA} className="mb-2">
-                                                        <ImageIcon />
-                                                    </Button>
-                                                    <Toast show={showA} onClose={toggleShowA}>
-                                                        <Toast.Header>
-                                                            <img
-                                                                src="holder.js/20x20?text=%20"
-                                                                className="rounded me-2"
-                                                                alt=""
-                                                            />
-                                                            <strong className="me-auto">Bootstrap</strong>
-                                                            <small>11 mins ago</small>
-                                                        </Toast.Header>
-                                                        <Toast.Body>Woohoo, you're reading this text in a Toast!</Toast.Body>
-                                                    </Toast>
+                                                    <PhotoListModal photos={item.photos} />
                                                 </Col>
                                             </Row>
                                         </td>

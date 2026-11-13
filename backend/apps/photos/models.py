@@ -12,6 +12,7 @@ class Photo(models.Model):
     url = models.URLField(max_length=200)
     album = models.ForeignKey(Album, on_delete=models.CASCADE, related_name="photos")
     orders = models.ManyToManyField(Order, related_name="photos", blank=True)
+    size = models.CharField(max_length=20, default="15x20")  # New field for photo size
     favorited_by = models.ManyToManyField(
         #User,
         settings.AUTH_USER_MODEL,
@@ -47,6 +48,7 @@ class Photo(models.Model):
             "featured": self.featured,
             "url": self.url,
             "album_name": self.album.name,
+            "album_author": self.album.author,
             "album_id": self.album.id,
             "is_favorited": is_favorited,
             "created_at": self.created_at.isoformat(),  # Include for consistency with serializer

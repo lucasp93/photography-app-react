@@ -64,7 +64,7 @@ export const AlbumPage: React.FC = () => {
                     <Row xs={1} md={4} className="g-4 justify-center">
                         {albums.map((album) => (
                             <Col key={album.id} className="flex justify-center">
-                                <AlbumCard key={album.id} album={album} showLinks={true} />
+                                <AlbumCard key={album.id} album={album} showLinks={false} />
                             </Col>
                         ))}
                     </Row> :
