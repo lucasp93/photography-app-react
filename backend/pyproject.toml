@@ -9,7 +9,7 @@ dependencies = [
     "django>=6.1",
     "django-cors-headers>=4.9.0",
     "django-filter>=26.1",
-    "django-phonenumber-field[phonenumber]>=8.5.0",
+    "django-phonenumber-field>=8.5.0",
     "djangorestframework>=3.18.0",
     "djangorestframework-simplejwt>=5.5.1",
     "drf-nested-routers>=0.95.3",
@@ -20,12 +20,9 @@ dependencies = [
     "uvicorn>=0.52.4",
 ]
 
-[project.scripts]
-backend = "backend:main"
-
-[build-system]
-requires = ["uv_build>=0.12.3,<0.13.0"]
-build-backend = "uv_build"
+[tool.uv]
+package = false
+concurrent-downloads = 4
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.settings"
@@ -43,3 +40,7 @@ dev = [
 [flake8]
 max-line-length = 120
 ignore = "E501"
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true

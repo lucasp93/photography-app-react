@@ -15,6 +15,18 @@ export const OrderListPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
+    // Filter State
+    const [filterOrderNumber, setFilterOrderNumber] = useState<string>('');
+    const [filterClientName, setFilterClientName] = useState<string>('');
+    const [filterClientEmail, setFilterClientEmail] = useState<string>('');
+
+    const handleClearFilters = () => {
+        setFilterOrderNumber('');
+        setFilterClientName('');
+        setFilterClientEmail('');
+        setCurrentPage(1);
+    };
+
     // Get target items from db
     const fetchItems = useCallback(async () => {
         const url = `${ApiUrls.getOrders}`;
@@ -29,45 +41,44 @@ export const OrderListPage: React.FC = () => {
         }
     }, []);
     // Form Input State
-    const [newItemOrderNumber, setNewItemOrderNumber] = useState<string>('');
-    const [newItemClientName, setNewItemClientName] = useState<string>('');
-    const [newItemClientContact, setNewItemClientContact] = useState<string>('');
-    const [newItemClientEmail, setNewItemClientEmail] = useState<string>('');
-    const [newItemPrice, setNewItemPrice] = useState<number>(0);
+    // const [newItemOrderNumber, setNewItemOrderNumber] = useState<string>('');
+    // const [newItemClientName, setNewItemClientName] = useState<string>('');
+    // const [newItemClientContact, setNewItemClientContact] = useState<string>('');
+    // const [newItemClientEmail, setNewItemClientEmail] = useState<string>('');
+    // const [newItemPrice, setNewItemPrice] = useState<number>(0);
     //const [newItemPhotos, setNewItemPhotos] = useState<string>('');
 
     // Add Item Handler
-    const handleAddItem = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newItemClientName.trim() || !newItemOrderNumber.trim()) return;
+    // const handleAddItem = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     if (!newItemClientName.trim() || !newItemOrderNumber.trim()) return;
 
-        const newItem: Order = {
-            id: Date.now(),
-            order_number: newItemOrderNumber,
-            client_name: newItemClientName,
-            client_contact: newItemClientContact,
-            client_email: newItemClientEmail,
-            price: newItemPrice,
-            photos: [],
-        };
+    //     const newItem: Order = {
+    //         id: Date.now(),
+    //         order_number: newItemOrderNumber,
+    //         client_name: newItemClientName,
+    //         client_contact: newItemClientContact,
+    //         client_email: newItemClientEmail,
+    //         price: newItemPrice,
+    //         photos: [],
+    //     };
 
-        // Create new album
-        const response = await createOrder(newItem);
-        if (response) {
-            setStatus('success');
-            setItems((prev) => [...prev, newItem]);
-        } else {
-            setStatus('error');
-        }
+    //     // Create new album
+    //     const response = await createOrder(newItem);
+    //     if (response) {
+    //         setStatus('success');
+    //         setItems((prev) => [...prev, newItem]);
+    //     } else {
+    //         setStatus('error');
+    //     }
 
-        // Reset Form Fields
-        setNewItemOrderNumber('');
-        setNewItemClientName('');
-        setNewItemClientContact('');
-        setNewItemClientEmail('');
-        setNewItemPrice(0);
-        //setNewItemPhotos('');
-    };
+    //     // Reset Form Fields
+    //     setNewItemOrderNumber('');
+    //     setNewItemClientName('');
+    //     setNewItemClientContact('');
+    //     setNewItemClientEmail('');
+    //     setNewItemPrice(0);
+    // };
 
     // Delete Item Handler
     const handleDeleteItem = async (id: number) => {
@@ -96,12 +107,27 @@ export const OrderListPage: React.FC = () => {
         fetchItems();
     }, [fetchItems]);
 
+    // Filter items by Order Number, Client Name, and Email
+    const filteredItems = items.filter((item) => {
+        const matchesOrder = (item.order_number ?? '')
+            .toLowerCase()
+            .includes(filterOrderNumber.trim().toLowerCase());
+        const matchesClient = (item.client_name ?? '')
+            .toLowerCase()
+            .includes(filterClientName.trim().toLowerCase());
+        const matchesEmail = (item.client_email ?? '')
+            .toLowerCase()
+            .includes(filterClientEmail.trim().toLowerCase());
+
+        return matchesOrder && matchesClient && matchesEmail;
+    });
+
     // 2. Pagination Calculations
-    const totalItems = items.length;
+    const totalItems = filteredItems.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -185,13 +211,13 @@ export const OrderListPage: React.FC = () => {
 
     if (status === 'loading') return <p>Loading items...</p>;
     if (status === 'error') return <p>Error: {error}</p>;
-    console.log('items: ', items);
+
     return (
         <div className="container py-4">
             {/* React Bootstrap Table */}
             <Card className="shadow-sm">
                 <Card.Header className="bg-white py-3">
-                    <Row className="align-items-center">
+                    <Row className="align-items-center mb-3">
                         <Col>
                             <h5 className="mb-0">Orders</h5>
                         </Col>
@@ -208,6 +234,57 @@ export const OrderListPage: React.FC = () => {
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
                             </Form.Select>
+                        </Col>
+                    </Row>
+
+                    {/* Filter Inputs */}
+                    <Row className="g-2 align-items-center">
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by Order # (e.g. ORD-...)"
+                                value={filterOrderNumber}
+                                onChange={(e) => {
+                                    setFilterOrderNumber(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={4}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by Client name..."
+                                value={filterClientName}
+                                onChange={(e) => {
+                                    setFilterClientName(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by Email..."
+                                value={filterClientEmail}
+                                onChange={(e) => {
+                                    setFilterClientEmail(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={2}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                className="w-100"
+                                onClick={handleClearFilters}
+                                disabled={!filterOrderNumber && !filterClientName && !filterClientEmail}
+                            >
+                                Clear Filters
+                            </Button>
                         </Col>
                     </Row>
                 </Card.Header>
@@ -232,9 +309,9 @@ export const OrderListPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {items.length === 0 ? (
+                            {filteredItems.length === 0 ? (
                                 <tr key="noorders-1">
-                                    <td colSpan={5} className="text-center text-muted py-4">
+                                    <td colSpan={8} className="text-center text-muted py-4">
                                         No orders found.
                                     </td>
                                 </tr>

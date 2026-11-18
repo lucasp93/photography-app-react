@@ -11,7 +11,6 @@ import Modal from '@mui/material/Modal';
 import api from '../services/api';
 import { ApiUrls } from '../utils/ApiUrls';
 import { useCart } from '../context/CartContext';
-import { sendEmail } from '../services/utils';
 import { useAuth } from '../context/AuthContext';
 
 const style = {
@@ -145,112 +144,112 @@ export const FinishOrderModal: React.FC<{
             //     setErrorMessage('Order created, but failed to send confirmation email.');
             // }
         } catch (err) {
-        console.log('error message: ', errorMessage);
-        console.log('Error creating order: ', err);
-        setErrorMessage(`Error creating order, ${err}`);
-    } finally {
-        setLoading(false);
-    }
-}
-
-return (
-    <div>
-        {trigger ? (
-            <span onClick={handleOpen}>{trigger}</span>
-        ) : (
-            <Button variant="dark" onClick={handleOpen}>Finish order</Button>
-        )
+            console.log('error message: ', errorMessage);
+            console.log('Error creating order: ', err);
+            setErrorMessage(`Error creating order, ${err}`);
+        } finally {
+            setLoading(false);
         }
+    }
+
+    return (
         <div>
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="finish-order-modal"
-                aria-describedby="Finish order modal for completing the purchase"
-            >
-                <Box sx={style}>
-                    <Stack className="flex flex-col gap-2">
-                        {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
-                        {successMessage && <Alert severity="success">{successMessage}</Alert>}
-                        <Form className="flex flex-col gap-2" onSubmit={handleFinishOrder}>
-                            <Form.Group controlId="formContactName">
-                                <Form.Label>Name</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="clientName"
-                                    value={formData.clientName}
-                                    onChange={handleChange}
-                                    placeholder="Enter your name"
-                                    required
-                                />
-                            </Form.Group>
-                            <Form.Group controlId="formEmail">
-                                <Form.Label>Email</Form.Label>
-                                <Form.Control
-                                    type="email"
-                                    name="clientEmail"
-                                    value={formData.clientEmail}
-                                    onChange={handleChange}
-                                    placeholder="name@example.com"
-                                    onBlur={() => handleBlur("email")}
-                                    isInvalid={isEmailInvalid}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    Please provide a valid email address.
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group controlId="formClientContact">
-                                <Form.Label>Contact</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="clientContact"
-                                    value={formData.clientContact}
-                                    onChange={handleChange}
-                                    placeholder="+33612345678"
-                                    title="Enter a phone number in international format, such as +33612345678."
-                                    onBlur={() => handleBlur("contact")}
-                                    isInvalid={isContactInvalid}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    Enter a valid phone number.
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                            <Typography variant="body1" sx={{ marginTop: '10px' }}>
-                                Total Price: $ {totalPrice.toFixed(2)}
-                            </Typography>
-                            <div className="flex flex-col items-center justify-center gap-2">
-                                <Button
-                                    className="mt-2 border rounded-full"
-                                    variant="dark"
-                                    size="lg"
-                                    type="submit"
-                                    disabled={loading || items.length === 0}
-                                >
-                                    {loading ? (
-                                        <>
-                                            <Spinner animation="border" size="sm" className="me-2" />
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        "Complete Order"
-                                    )
-                                    }
-                                </Button>
-                                {/* <Link href="/login" sx={{ fontSize: '15px', color: 'grey', textDecoration: 'none', '&:hover': { color: 'lightgrey', textDecoration: 'none' } }}>
+            {trigger ? (
+                <span onClick={handleOpen}>{trigger}</span>
+            ) : (
+                <Button variant="dark" onClick={handleOpen}>Finish order</Button>
+            )
+            }
+            <div>
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="finish-order-modal"
+                    aria-describedby="Finish order modal for completing the purchase"
+                >
+                    <Box sx={style}>
+                        <Stack className="flex flex-col gap-2">
+                            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+                            {successMessage && <Alert severity="success">{successMessage}</Alert>}
+                            <Form className="flex flex-col gap-2" onSubmit={handleFinishOrder}>
+                                <Form.Group controlId="formContactName">
+                                    <Form.Label>Name</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="clientName"
+                                        value={formData.clientName}
+                                        onChange={handleChange}
+                                        placeholder="Enter your name"
+                                        required
+                                    />
+                                </Form.Group>
+                                <Form.Group controlId="formEmail">
+                                    <Form.Label>Email</Form.Label>
+                                    <Form.Control
+                                        type="email"
+                                        name="clientEmail"
+                                        value={formData.clientEmail}
+                                        onChange={handleChange}
+                                        placeholder="name@example.com"
+                                        onBlur={() => handleBlur("email")}
+                                        isInvalid={isEmailInvalid}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Please provide a valid email address.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group controlId="formClientContact">
+                                    <Form.Label>Contact</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        name="clientContact"
+                                        value={formData.clientContact}
+                                        onChange={handleChange}
+                                        placeholder="+33612345678"
+                                        title="Enter a phone number in international format, such as +33612345678."
+                                        onBlur={() => handleBlur("contact")}
+                                        isInvalid={isContactInvalid}
+                                        required
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        Enter a valid phone number.
+                                    </Form.Control.Feedback>
+                                </Form.Group>
+                                <Typography variant="body1" sx={{ marginTop: '10px' }}>
+                                    Total Price: $ {totalPrice.toFixed(2)}
+                                </Typography>
+                                <div className="flex flex-col items-center justify-center gap-2">
+                                    <Button
+                                        className="mt-2 border rounded-full"
+                                        variant="dark"
+                                        size="lg"
+                                        type="submit"
+                                        disabled={loading || items.length === 0}
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Spinner animation="border" size="sm" className="me-2" />
+                                                Processing...
+                                            </>
+                                        ) : (
+                                            "Complete Order"
+                                        )
+                                        }
+                                    </Button>
+                                    {/* <Link href="/login" sx={{ fontSize: '15px', color: 'grey', textDecoration: 'none', '&:hover': { color: 'lightgrey', textDecoration: 'none' } }}>
                                 Already have an account? Log in
                             </Link> */}
-                                {/* <Typography variant="body2">
+                                    {/* <Typography variant="body2">
                                     {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
                                     {successMessage && <p className="text-sm text-green-500">{successMessage}</p>}
                                 </Typography> */}
-                            </div>
-                        </Form>
-                    </Stack>
-                </Box>
-            </Modal>
+                                </div>
+                            </Form>
+                        </Stack>
+                    </Box>
+                </Modal>
+            </div>
         </div>
-    </div>
-)
+    )
 };

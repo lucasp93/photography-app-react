@@ -1,143 +1,164 @@
 # Photography App Backend
 
-Django REST API for the photography booking application.
+Django 6 REST API and Celery background worker for the photography booking and ordering application.
 
 ## Overview
 
-This backend provides the API for:
-- user authentication and registration
-- photo management
-- album management
-- order processing
-- JWT-based authorization
+This backend provides:
+- **User Accounts & Recovery**: Custom `User` model, registration, login, and password reset emails.
+- **Album Management**: CRUD endpoints with search (`name`, `event`, `author`) and ordering (`created_at`, `name`).
+- **Photo Management**: CRUD endpoints for album photos, photo sizes (`15x20`), featured filtering, and user favorites toggling.
+- **Order Processing**: Order creation (`ORD-...`), photo associations, and order listing/filtering (`order_number`, `client_name`, `client_email`).
+- **Async Email Tasks (Celery + Redis)**: Sends HTML order confirmation emails (`send_order_confirmation_email`) and password reset emails (`send_password_reset_email_task`).
 
-## Tech stack
+---
 
-- Python 3.13+
-- Django 6
-- Django REST Framework
-- Django SimpleJWT
-- PostgreSQL
-- Django filter and CORS support
+## Tech Stack
 
-## Local setup
+- **Python 3.13+**
+- **Django 6.1** & **Django REST Framework 3.18**
+- **Uvicorn** (ASGI server)
+- **PostgreSQL 15** (`psycopg2-binary`)
+- **Celery 5.6** & **Redis** (`redis`)
+- **Django Filter**, **Django CORS Headers**, **Django Phonenumber Field** (`phonenumbers`)
 
-### 1) Start PostgreSQL
+---
 
-From this directory:
+## Local Setup
+
+### 1) Start PostgreSQL and Redis
+
+From the `backend/` directory:
 
 ```bash
 docker compose up -d
 ```
 
-This starts PostgreSQL and Redis. Redis is the Celery message broker.
+This starts:
+- **PostgreSQL** on `localhost:5432` (configured in `docker-compose.yml`)
+- **Redis** on `localhost:6379` (Celery message broker & result backend)
 
-### Configure email and Celery
+### 2) Configure Environment Variables (`.env`)
 
-Copy `.env.example` to `.env` if needed, keep your existing database values, and set the SMTP values supplied by your email provider. Django uses the console email backend when `EMAIL_HOST` is blank; configure SMTP to deliver email to inboxes. Frontend EmailJS settings are separate and are not used by Django.
-
-Run these commands from the `backend` directory, in separate terminals:
+Copy `.env.example` to `.env`:
 
 ```bash
-uv run python manage.py runserver
-uv run celery -A core worker -l info
+cp .env.example .env
 ```
 
-The worker must stay running to process queued password reset emails.
+Expected variables in `backend/.env` (never commit `.env` to version control):
 
-### 2) Install dependencies
+```env
+DEBUG=True
+SECRET_KEY=<your-generated-secret-key>
+
+POSTGRES_DB=photography_db
+POSTGRES_USER=<your-db-user>
+POSTGRES_PASSWORD=<your-db-password>
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+
+FRONTEND_URL=http://localhost:5173
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/1
+
+# Email settings:
+# Leave EMAIL_HOST empty for local dev to print emails to the console,
+# or configure your SMTP provider credentials.
+EMAIL_HOST=
+EMAIL_PORT=587
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_USE_TLS=true
+EMAIL_USE_SSL=false
+DEFAULT_FROM_EMAIL=noreply@localhost
+```
+
+### 3) Install Dependencies
+
+Using `uv` (recommended):
 
 ```bash
 uv sync
 ```
 
-### 3) Activate the environment (optional)
+*(Optional)* Activate the virtual environment in your shell:
 
 ```bash
 source .venv/bin/activate
 ```
 
-### 4) Run migrations
-
-```bash
-uv run python manage.py migrate
-```
-
-### 5) Start the backend
-
-```bash
-uv run python manage.py runserver 0.0.0.0:8000
-uv run uvicorn core.asgi:application --host 127.0.0.1 --port 8000 --reload
-```
-
-The API will be available at:
-- `http://127.0.0.1:8000`
-
-## Custom settings to be aware of
-
-The project currently uses PostgreSQL with a local development configuration in [core/settings.py](core/settings.py):
-- database: `photography_db`
-- user: `postgres`
-- password: `lucas123`
-- host: `localhost`
-- port: `5432`
-
-If your local setup differs, update those values before running the server.
-
-## Migrations
-
-Create migrations after model changes:
+### 4) Run Database Migrations
 
 ```bash
 uv run python manage.py makemigrations
-```
-
-Apply them:
-
-```bash
 uv run python manage.py migrate
 ```
 
-## Testing
+### 5) Start the API Server and Celery Worker
 
-Run the backend test suite:
-
-```bash
-uv run pytest
-```
-
-## Useful commands
+Run the API server with Uvicorn (ASGI) or Django's development server:
 
 ```bash
-# install dependencies
-uv sync
-
-# run server
+uv run uvicorn core.asgi:application --host 127.0.0.1 --port 8000 --reload
+# Or:
 uv run python manage.py runserver 0.0.0.0:8000
+```
 
-# run tests
+In a second terminal, start the Celery worker:
+
+```bash
+uv run celery -A core worker -l info
+```
+
+The API will be available at `http://127.0.0.1:8000`.
+
+---
+
+## API Endpoints
+
+All endpoints are prefixed with `/api/`:
+
+| Area | Endpoint | Methods | Description |
+| :--- | :--- | :--- | :--- |
+| **Users** | `/api/users/` | `GET`, `POST` | List users or register a new user |
+| | `/api/users/<id>/` | `GET`, `PUT`, `PATCH`, `DELETE` | Retrieve, update, or delete user |
+| | `/api/password/reset/` | `POST` | Request password reset email |
+| | `/api/password/reset/confirm/` | `POST` | Confirm password reset |
+| **Albums** | `/api/albums/` | `GET`, `POST` | List/filter albums (`name`, `event`, `author`) or create |
+| | `/api/albums/<id>/` | `GET`, `PUT`, `PATCH`, `DELETE` | Retrieve, update, or delete album |
+| **Photos** | `/api/photos/` | `GET`, `POST` | List/filter photos (`album_id`, `featured`) or create |
+| | `/api/photos/<id>/` | `GET`, `PUT`, `PATCH`, `DELETE` | Retrieve, update, or delete photo |
+| | `/api/photos/favorites/` | `GET` | List user's favorite photos |
+| **Orders** | `/api/orders/` | `GET`, `POST` | Create or list orders |
+| | `/api/orders/<id>/` | `GET`, `PUT`, `PATCH`, `DELETE` | Retrieve, update, or delete order |
+
+---
+
+## Testing & Code Quality
+
+```bash
+# Run full test suite with pytest
 uv run pytest
 
-# refresh environment if dependency issues appear
-rm -rf .venv
-uv sync
+# Run linter
+uv run ruff check .
+uv run pflake8
 ```
+
+---
 
 ## Troubleshooting
 
-If the app fails to start because of missing packages or an inconsistent environment:
-
-```bash
-rm -rf .venv
-uv sync
-```
-
-If the database connection fails, confirm Docker is running and the Postgres container is healthy:
-
-```bash
-docker compose ps
-```
-
-## API conventions
-
-The app exposes endpoints under `/api/...` and uses JWT authentication for protected routes. Tokens are handled by the SimpleJWT configuration in the Django settings.
+- **Using `pip3` inside `.venv`**:
+  `uv venv` creates `.venv` without `pip` by default. To add `pip3` into `.venv` offline, run:
+  ```bash
+  .venv/bin/python -m ensurepip --upgrade
+  source .venv/bin/activate
+  pip3 install -r requirements.txt
+  ```
+  Or use `uv pip install -r requirements.txt`.
+- **PyPI Connection Timeouts (`files.pythonhosted.org`)**:
+  `pyproject.toml` is configured with `[[tool.uv.index]]` pointing to `https://pypi.tuna.tsinghua.edu.cn/simple` as a fallback mirror if `files.pythonhosted.org` is unreachable on your network.
+- **Database Connection Refused**:
+  Verify Docker containers are up with `docker compose ps` and that your `POSTGRES_*` values in `backend/.env` match `docker-compose.yml`.

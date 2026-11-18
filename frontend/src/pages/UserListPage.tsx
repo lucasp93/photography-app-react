@@ -14,6 +14,20 @@ export const UserListPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
+    // Filter State
+    const [filterUsername, setFilterUsername] = useState<string>('');
+    const [filterEmail, setFilterEmail] = useState<string>('');
+    const [filterFirstName, setFilterFirstName] = useState<string>('');
+    const [filterLastname, setFilterLastName] = useState<string>('');
+
+    const handleClearFilters = () => {
+        setFilterUsername('');
+        setFilterEmail('');
+        setFilterFirstName('');
+        setFilterLastName('');
+    };
+
+
     // Get target items from db
     const fetchItems = useCallback(async () => {
         const url = `${ApiUrls.getUsers}`;
@@ -99,12 +113,30 @@ export const UserListPage: React.FC = () => {
         fetchItems();
     }, [fetchItems]);
 
+    // Filter items by username, email, first name and last name
+    const filteredItems = items.filter((item) => {
+        const matchesUsername = (item.username ?? '')
+            .toLowerCase()
+            .includes(filterUsername.trim().toLowerCase());
+        const matchesEmail = (item.email ?? '')
+            .toLowerCase()
+            .includes(filterEmail.trim().toLowerCase());
+        const matchFirstName = (item.first_name ?? '')
+            .toLowerCase()
+            .includes(filterFirstName.trim().toLowerCase());
+        const matchLastName = (item.last_name ?? '')
+            .toLowerCase()
+            .includes(filterLastname.trim().toLowerCase());
+
+        return matchesUsername && matchesEmail && matchFirstName && matchLastName;
+    });
+
     // 2. Pagination Calculations
-    const totalItems = items.length;
+    const totalItems = filteredItems.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -287,9 +319,9 @@ export const UserListPage: React.FC = () => {
             {/* React Bootstrap Table */}
             <Card className="shadow-sm">
                 <Card.Header className="bg-white py-3">
-                    <Row className="align-items-center">
+                    <Row className="align-items-center mb-3">
                         <Col>
-                            <h5 className="mb-0">Albums</h5>
+                            <h5 className="mb-0">Users</h5>
                         </Col>
                         {/* Items per page limit selector */}
                         <Col xs="auto" className="d-flex align-items-center gap-2">
@@ -304,6 +336,68 @@ export const UserListPage: React.FC = () => {
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
                             </Form.Select>
+                        </Col>
+                    </Row>
+                    {/* Filter inputs */}
+                    <Row className="g-2 align-items-center">
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by username"
+                                value={filterUsername}
+                                onChange={(e) => {
+                                    setFilterUsername(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by email"
+                                value={filterEmail}
+                                onChange={(e) => {
+                                    setFilterEmail(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={2}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by first name"
+                                value={filterFirstName}
+                                onChange={(e) => {
+                                    setFilterFirstName(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={2}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by last name"
+                                value={filterLastname}
+                                onChange={(e) => {
+                                    setFilterLastName(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={2}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                className="w-100"
+                                onClick={handleClearFilters}
+                                disabled={!filterEmail && !filterUsername && !filterFirstName && !filterLastname}
+                            >
+                                Clear filters
+                            </Button>
                         </Col>
                     </Row>
                 </Card.Header>
@@ -325,7 +419,7 @@ export const UserListPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {items.length === 0 ? (
+                            {filteredItems.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="text-center text-muted py-4">
                                         No items in table. Add one above!

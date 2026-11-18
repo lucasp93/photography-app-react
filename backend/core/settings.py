@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'apps.albums',
     'apps.orders',
     'apps.photos',
-    'anymail',
+    # 'anymail',
 ]
 
 # Set DRF to use SimpleJWT by default
@@ -177,12 +177,12 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "true").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "false").lower() == "true"
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
-# EMAIL_BACKEND = (
-#     "django.core.mail.backends.smtp.EmailBackend"
-#     if EMAIL_HOST
-#     else "django.core.mail.backends.console.EmailBackend"
-# )
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend"
+    if EMAIL_HOST
+    else "django.core.mail.backends.console.EmailBackend"
+)
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 # Anymail settings

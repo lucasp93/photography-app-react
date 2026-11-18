@@ -1,62 +1,78 @@
 # Photography App
 
-A full-stack photography booking platform built with React + Vite on the frontend and Django REST Framework on the backend.
+A full-stack photography portfolio, booking, and print-ordering platform built with **React 19 + TypeScript + Vite** on the frontend and **Django 6 + Django REST Framework + Celery** on the backend.
 
-This project includes:
-- user registration and authentication
-- photo catalog management
-- album management
-- order creation and tracking
-- email sending via EmailJS
+## Features
 
-## Project structure
+- **User Accounts & Access Control**: User registration, login, and password reset via email.
+- **Portfolio & Album Management**: Browse albums by event category (`weddings`, `birthday`, `family`, `business`, `maternity`, `newborn`), create/update/delete albums, and view album galleries.
+- **Photo Catalog & Favorites**: Manage photos with size options (`15x20`, etc.), featured flags, and per-user favorite photo lists.
+- **Shopping Cart & Order Checkout**: Persistent cart (`CartContext`), guest and authenticated checkout, order management table with pagination, photo preview modals, and filters (by Order #, Client Name, and Email).
+- **Asynchronous Email Notifications**:
+  - **Backend (Celery + Redis + Django SMTP)**: Queues and sends HTML order confirmation emails and password reset links.
+  - **Frontend (EmailJS)**: Handles contact form inquiries.
+
+---
+
+## Project Structure
 
 ```text
 photography-app-react/
-├── backend/               # Django REST API
-│   ├── apps/              # Django apps
-│   ├── core/              # settings, urls, ASGI/WSGI
-│   ├── docker-compose.yml # Postgres service for local development
+├── backend/                  # Django 6 REST API + Celery tasks
+│   ├── apps/                 # Domain apps (users, albums, photos, orders) & tasks.py
+│   ├── core/                 # Project settings, URLs, ASGI/WSGI, Celery config
+│   ├── docker-compose.yml    # PostgreSQL 15 & Redis 7 services
+│   ├── .env.example          # Backend environment template
 │   ├── manage.py
-│   ├── pyproject.toml
+│   ├── pyproject.toml        # uv project & dependencies
+│   ├── requirements.txt      # pip-compatible dependency list
 │   └── README.md
-├── frontend/              # React + TypeScript + Vite app
+├── frontend/                 # React 19 + TypeScript + Vite SPA
 │   ├── src/
+│   │   ├── components/       # Reusable UI components, modals, forms & Jest tests
+│   │   ├── context/          # AuthContext & CartContext
+│   │   ├── interfaces/       # TypeScript domain interfaces (Photo, Album, Order, User)
+│   │   ├── pages/            # Public & protected route pages
+│   │   ├── routes/           # AppRoutes & ProtectedRoute
+│   │   ├── services/         # Axios API client & CRUD helpers
+│   │   └── utils/            # ApiUrls constants
+│   ├── jest.config.cjs       # Jest + ts-jest configuration
 │   ├── package.json
 │   └── README.md
-├── README.md
-├── README.me
+├── CLAUDE.md                 # AI assistant development guide
+├── README.md                 # Main project documentation
 └── LICENSE
 ```
 
-## Tech stack
+---
 
-Frontend:
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
-- Axios / fetch-based API wrapper
+## Tech Stack
 
-Backend:
-- Python 3.13
-- Django 6
-- Django REST Framework
-- SimpleJWT
-- PostgreSQL
-- Celery (configured in dependencies)
+### Frontend
+- **React 19** + **TypeScript 6** + **Vite 8**
+- **Styling & UI**: Tailwind CSS 4, React Bootstrap, Bootstrap 5, Material UI (`@mui/material`, `@mui/icons-material`), Lucide React, Swiper
+- **Routing & State**: React Router v7, React Context (`AuthContext`, `CartContext`)
+- **HTTP & Services**: Axios (centralized API wrapper), EmailJS (`@emailjs/browser`)
+- **Testing**: Jest 30, `ts-jest`, React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`)
+
+### Backend
+- **Python 3.13+**
+- **Web Framework**: Django 6.1, Django REST Framework (`djangorestframework`), `django-cors-headers`, `django-filter`, `django-phonenumber-field`
+- **ASGI Server**: Uvicorn (`uvicorn`)
+- **Database**: PostgreSQL 15 (`psycopg2-binary`)
+- **Task Queue & Broker**: Celery 5.6 + Redis (`redis`)
+
+---
 
 ## Prerequisites
 
-Before starting, make sure these are installed:
-- Python 3.13+
-- Node.js 20+
-- npm
-- Docker Desktop (for PostgreSQL container)
-- uv (recommended for Python dependency management)
+- **Python 3.13+** and **[uv](https://docs.astral.sh/uv/)**
+- **Node.js 20+** and **npm**
+- **Docker Desktop** (for PostgreSQL and Redis containers)
 
-## Local development setup
+---
+
+## Local Development Setup
 
 ### 1) Clone the repository
 
@@ -65,86 +81,81 @@ git clone <repository-url>
 cd photography-app-react
 ```
 
-### 2) Start PostgreSQL
-
-The backend is configured to use PostgreSQL locally via Docker Compose.
+### 2) Start PostgreSQL and Redis (Docker)
 
 ```bash
 cd backend
 docker compose up -d
 ```
 
-This creates a local Postgres instance on:
-- host: `localhost`
-- port: `5432`
-- database: `photography_db`
-- user: `postgres`
-- password: `lucas123`
+This starts:
+- **PostgreSQL 15** on `localhost:5432` (configured via `backend/docker-compose.yml`)
+- **Redis 7** on `localhost:6379` (Celery broker & result backend)
 
-> These values are currently set in [backend/core/settings.py](backend/core/settings.py). Update them if your local environment differs.
+### 3) Configure Backend Environment Variables
 
-### 3) Install backend dependencies
+Copy `.env.example` to `.env` inside `backend/`:
 
-From the backend directory:
+```bash
+cd backend
+cp .env.example .env
+```
+
+Update `backend/.env` with your own local values (never commit `.env` to version control):
+
+```env
+DEBUG=True
+SECRET_KEY=<your-generated-secret-key>
+POSTGRES_DB=photography_db
+POSTGRES_USER=<your-db-user>
+POSTGRES_PASSWORD=<your-db-password>
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+FRONTEND_URL=http://localhost:5173
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/1
+
+# Leave EMAIL_HOST empty in local dev to print emails to console, or set SMTP credentials:
+EMAIL_HOST=
+EMAIL_PORT=587
+EMAIL_HOST_USER=
+EMAIL_HOST_PASSWORD=
+EMAIL_USE_TLS=true
+EMAIL_USE_SSL=false
+DEFAULT_FROM_EMAIL=noreply@localhost
+```
+
+### 4) Install Backend Dependencies & Run Migrations
 
 ```bash
 cd backend
 uv sync
-```
-
-If you want to create the virtual environment explicitly:
-
-```bash
-source .venv/bin/activate
-```
-
-### 4) Run database migrations
-
-```bash
-cd backend
 uv run python manage.py migrate
 ```
 
-If you need to generate migrations after changing models:
+### 5) Start the Backend API & Celery Worker
 
-```bash
-uv run python manage.py makemigrations
-```
-
-### 5) Start the Django API
+Run the API server (using Uvicorn ASGI or Django's dev server):
 
 ```bash
 cd backend
+uv run uvicorn core.asgi:application --host 127.0.0.1 --port 8000 --reload
+# Or:
 uv run python manage.py runserver 0.0.0.0:8000
 ```
 
-The API should be available at:
-- `http://127.0.0.1:8000`
-
-### 6) Install frontend dependencies
-
-From the frontend directory:
+In a separate terminal, start the Celery worker to process order confirmation and password reset emails:
 
 ```bash
-cd frontend
-npm install
+cd backend
+uv run celery -A core worker -l info
 ```
 
-### 7) Start the frontend
+The backend API will be available at `http://127.0.0.1:8000`.
 
-```bash
-cd frontend
-npm run dev
-```
+### 6) Configure & Start the Frontend
 
-The app will typically run at:
-- `http://localhost:5173`
-
-## Environment variables
-
-The frontend expects EmailJS variables to be configured in a `.env` file.
-
-Create a `.env` file in the `frontend` folder with values like:
+Create `frontend/.env` for EmailJS (and optional local settings):
 
 ```env
 VITE_EMAILJS_SERVICE_ID=your_service_id
@@ -153,65 +164,53 @@ VITE_EMAILJS_ADMIN_TEMPLATE_ID=your_admin_template_id
 VITE_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
-The app also uses a Django auth flow with JWT tokens via `/api/token/` and `/api/token/refresh/`.
-
-## Testing
-
-### Backend tests
-
-```bash
-cd backend
-uv run pytest
-```
-
-### Frontend validation
+Install dependencies and start Vite:
 
 ```bash
 cd frontend
-npm run build
-npm run lint
+npm install
+npm run dev
 ```
 
-## Common troubleshooting
+The frontend will be available at `http://localhost:5173`.
 
-### Backend dependency errors
+---
 
-If `uv` or Python packages are missing or the environment is inconsistent:
+## Testing & Linting
 
+### Backend
 ```bash
 cd backend
-rm -rf .venv
-uv sync
+uv run pytest
+uv run ruff check .
 ```
 
-### Database connection issues
-
-Check that Postgres is running:
-
+### Frontend
 ```bash
-docker compose ps
+cd frontend
+npm test        # Run Jest unit tests
+npm run lint    # Run ESLint
+npm run build   # Type-check with tsc and build production bundle
 ```
 
-If needed, restart the container:
+---
 
-```bash
-docker compose down
-docker compose up -d
-```
+## Common Troubleshooting
 
-### Frontend runs but API calls fail
+- **Backend dependency or `.venv` issues**:
+  ```bash
+  cd backend
+  rm -rf .venv
+  uv sync
+  ```
+  If using `pip3` directly inside `.venv`, bootstrap pip first with `.venv/bin/python -m ensurepip --upgrade`.
+- **Database or Redis connection errors**:
+  Ensure Docker containers are running with `docker compose ps` inside `backend/`.
+- **Secret key warnings**:
+  Ensure `SECRET_KEY` in `backend/.env` is a strong, randomly generated value.
 
-Verify:
-- the Django server is running on port 8000
-- CORS settings allow your frontend origin
-- the frontend is hitting the correct API paths
-
-## Notes for contributors
-
-- The backend uses Django’s default auth model with a custom `User` model.
-- The frontend routes and API utilities expect the backend API base to be `/api/...`.
-- This repo is primarily a local development project; production deployment, environment hardening, and secret management are not fully documented yet.
+---
 
 ## License
 
-This project is licensed under the terms specified in the repository license file.
+This project is licensed under the terms specified in the [LICENSE](LICENSE) file.

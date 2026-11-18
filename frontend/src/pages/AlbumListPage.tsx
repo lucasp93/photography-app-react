@@ -14,6 +14,18 @@ export const AlbumListPage: React.FC = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
+    // Filter state
+    const [filterTitle, setFilterTitle] = useState<string>('');
+    const [filterAuthor, setFilterAuthor] = useState<string>('');
+    const [filterEvent, setFilterEvent] = useState<string>('');
+
+    const handleClearFilters = () => {
+        setFilterTitle('');
+        setFilterAuthor('');
+        setFilterEvent('');
+        setCurrentPage(1);
+    };
+
     // Get target items from db
     const fetchItems = useCallback(async () => {
         const url = `${ApiUrls.getAlbums}`;
@@ -87,12 +99,27 @@ export const AlbumListPage: React.FC = () => {
         fetchItems();
     }, [fetchItems]);
 
+    // Filter items by username, email, first name and last name
+    const filteredItems = items.filter((item) => {
+        const matchesAuthor = (item.author ?? '')
+            .toLowerCase()
+            .includes(filterAuthor.trim().toLowerCase());
+        const matchesEvent = (item.event ?? '')
+            .toLowerCase()
+            .includes(filterEvent.trim().toLowerCase());
+        const matchName = (item.name ?? '')
+            .toLowerCase()
+            .includes(filterTitle.trim().toLowerCase());
+
+        return matchesAuthor && matchesEvent && matchName;
+    });
+
     // 2. Pagination Calculations
-    const totalItems = items.length;
+    const totalItems = filteredItems.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -241,7 +268,7 @@ export const AlbumListPage: React.FC = () => {
             {/* React Bootstrap Table */}
             <Card className="shadow-sm">
                 <Card.Header className="bg-white py-3">
-                    <Row className="align-items-center">
+                    <Row className="align-items-center mb-3">
                         <Col>
                             <h5 className="mb-0">Albums</h5>
                         </Col>
@@ -260,6 +287,56 @@ export const AlbumListPage: React.FC = () => {
                             </Form.Select>
                         </Col>
                     </Row>
+                    {/* Filter inputs */}
+                    <Row className="g-2 align-items-center">
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by name"
+                                value={filterTitle}
+                                onChange={(e) => {
+                                    setFilterTitle(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by author"
+                                value={filterAuthor}
+                                onChange={(e) => {
+                                    setFilterAuthor(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by event"
+                                value={filterEvent}
+                                onChange={(e) => {
+                                    setFilterEvent(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                className="w-100"
+                                onClick={handleClearFilters}
+                                disabled={!filterAuthor && !filterEvent && !filterTitle}
+                            >
+                                Clear filters
+                            </Button>
+                        </Col>
+                    </Row>
                 </Card.Header>
 
                 <Card.Body className="p-0">
@@ -276,7 +353,7 @@ export const AlbumListPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {items.length === 0 ? (
+                            {filteredItems.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="text-center text-muted py-4">
                                         No items in table. Add one above!

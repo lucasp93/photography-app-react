@@ -22,12 +22,17 @@ export const PhotoListPage: React.FC = () => {
     const [newItemUrl, setNewItemUrl] = useState<string>('');
     const [newItemAlbumId, setNewItemAlbumId] = useState<string>('');
 
-    // 3. Pagination Calculations
-    const totalItems = items.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+    // Filter state
+    const [filterName, setFilterName] = useState<string>('');
+    const [filterAuthor, setFilterAuthor] = useState<string>('');
+    const [filterEvent, setFilterEvent] = useState<string>('');
+
+    const handleClearFilters = () => {
+        setFilterName('');
+        setFilterAuthor('');
+        setFilterEvent('');
+        setCurrentPage(1);
+    };
 
     // Get target items from db
     const fetchItems = useCallback(async () => {
@@ -60,10 +65,34 @@ export const PhotoListPage: React.FC = () => {
         Promise.all([fetchItems(), fetchAlbumsInfo()]).catch(() => setStatus('error'));
     }, [fetchItems, fetchAlbumsInfo]);
 
+    // Filter items by username, email, first name and last name
+    const filteredItems = items.filter((item) => {
+        const matchesName = (item.name ?? '')
+            .toLowerCase()
+            .includes(filterName.trim().toLowerCase());
+        const matchesAuthor = (item.author ?? '')
+            .toLowerCase()
+            .includes(filterAuthor.trim().toLowerCase());
+        const matchEvent = (item.album_name ?? '')
+            .toLowerCase()
+            .includes(filterEvent.trim().toLowerCase());
+
+        return matchesAuthor && matchesName && matchEvent;
+    });
+
+    // Pagination Calculations
+    const totalItems = filteredItems.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
     // Add Item Handler
     const handleAddItem = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newItemName.trim() || !newItemAuthor.trim()) return;
+
+        const newAlbum = albums.find((album) => String(album.id) === newItemAlbumId) || null;
 
         const newItem: Photo = {
             id: Date.now(),
@@ -73,8 +102,9 @@ export const PhotoListPage: React.FC = () => {
             is_favorited: false,
             url: newItemUrl,
             album_id: newItemAlbumId,
-            album: albums.find((album) => String(album.id) === newItemAlbumId) || null,
-            album_name: '',
+            album: newAlbum,
+            album_name: newAlbum?.name ?? '',
+            album_author: newAlbum?.author ?? '',
             size: '',
         };
 
@@ -202,7 +232,7 @@ export const PhotoListPage: React.FC = () => {
                     {/* Add Item Form */}
                     <Form onSubmit={handleAddItem}>
                         <Row className="g-3 align-items-end">
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group controlId="itemName">
                                     <Form.Label>Name</Form.Label>
                                     <Form.Control
@@ -214,7 +244,7 @@ export const PhotoListPage: React.FC = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group controlId="itemAuthor">
                                     <Form.Label>Author</Form.Label>
                                     <Form.Control
@@ -226,7 +256,7 @@ export const PhotoListPage: React.FC = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group controlId="itemUrl">
                                     <Form.Label>Url</Form.Label>
                                     <Form.Control
@@ -238,7 +268,7 @@ export const PhotoListPage: React.FC = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={4}>
                                 <Form.Group controlId="itemAlbum">
                                     <Form.Label>Album</Form.Label>
                                     <Form.Select
@@ -254,7 +284,7 @@ export const PhotoListPage: React.FC = () => {
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={5}>
                                 <Form.Group className="mb-3 flex flex-row justify-left" controlId="itemFeatured">
                                     <Form.Label>Featured</Form.Label>
                                     <Form.Check
@@ -279,7 +309,7 @@ export const PhotoListPage: React.FC = () => {
             {/* Table Section */}
             <Card className="shadow-sm">
                 <Card.Header className="bg-white py-3">
-                    <Row className="align-items-center">
+                    <Row className="align-items-center mb-3">
                         <Col>
                             <h5 className="mb-0">Photos</h5>
                         </Col>
@@ -295,6 +325,56 @@ export const PhotoListPage: React.FC = () => {
                                 <option value={10}>10</option>
                                 <option value={20}>20</option>
                             </Form.Select>
+                        </Col>
+                    </Row>
+                    {/* Filter inputs */}
+                    <Row className="g-2 align-items-center">
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by name"
+                                value={filterName}
+                                onChange={(e) => {
+                                    setFilterName(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by author"
+                                value={filterAuthor}
+                                onChange={(e) => {
+                                    setFilterAuthor(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Form.Control
+                                size="sm"
+                                type="text"
+                                placeholder="Filter by album"
+                                value={filterEvent}
+                                onChange={(e) => {
+                                    setFilterEvent(e.target.value)
+                                    setCurrentPage(1);
+                                }}
+                            />
+                        </Col>
+                        <Col md={3}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                className="w-100"
+                                onClick={handleClearFilters}
+                                disabled={!filterAuthor && !filterEvent && !filterName}
+                            >
+                                Clear filters
+                            </Button>
                         </Col>
                     </Row>
                 </Card.Header>
@@ -313,7 +393,7 @@ export const PhotoListPage: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {items.length === 0 ? (
+                            {filteredItems.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="text-center text-muted py-4">
                                         No items in table. Add one above!

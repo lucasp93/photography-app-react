@@ -1,46 +1,48 @@
 # Photography App Frontend
 
-React + TypeScript frontend for the photography application.
+React 19 + TypeScript + Vite single-page application for the photography portfolio and print-ordering platform.
 
 ## Overview
 
-This frontend provides the user-facing interface for:
-- user signup and login
-- browsing albums and photos
-- creating and viewing orders
-- managing shopping/cart flows
-- contact and email submission
+This frontend provides:
+- **Public Portfolio & Galleries**: Home page, event-filtered album galleries (`/portfolio/:event_name`), album photo viewer (`/albums/:album_id`), experience, testimonials, and contact page.
+- **Authentication & Password Recovery**: Login (`/login`), signup (`/signup`), password reset request (`/password/reset`), and password reset confirmation (`/password/reset/confirm/:uid/:token`).
+- **Shopping Cart & Checkout**: Persistent shopping cart via `CartContext`, photo size selection, and checkout modal (`/checkout/cart`).
+- **Protected Management Pages**:
+  - **Albums (`/albums`)**: Paginated table and form to create/delete albums.
+  - **Photos (`/photos`)**: Paginated table and form to add/delete photos and assign albums.
+  - **Orders (`/orders`)**: Paginated table with live filters (**Order #**, **Client**, **Email**), photo list modal preview, and delete actions.
+  - **Users (`/users`)**: Paginated user management table.
+  - **Favourites (`/favourites`)**: Authenticated user's saved favorite photos.
 
-## Tech stack
+---
 
-- React 19
-- TypeScript
-- Vite
-- React Router
-- Tailwind CSS
-- Material UI helpers
-- EmailJS
+## Tech Stack
 
-## Local setup
+- **Framework**: React 19 + TypeScript 6 + Vite 8
+- **Routing**: React Router DOM v7
+- **Styling & UI Components**:
+  - Tailwind CSS v4 (`@tailwindcss/vite`)
+  - React Bootstrap & Bootstrap 5
+  - Material UI (`@mui/material`, `@mui/icons-material`)
+  - Lucide React icons & Swiper carousels
+- **HTTP & Email**: Axios (centralized in `src/services/api.ts`), EmailJS (`@emailjs/browser`)
+- **Unit Testing**: Jest 30, `ts-jest`, React Testing Library (`@testing-library/react`, `@testing-library/jest-dom`), JSDOM
 
-### 1) Install dependencies
+---
+
+## Local Setup
+
+### 1) Install Dependencies
 
 ```bash
+cd frontend
 npm install
 ```
 
-### 2) Start the app
+### 2) Configure Environment Variables
 
-```bash
-npm run dev
-```
-
-The frontend usually runs at:
-- `http://localhost:5173`
-
-## Environment variables
-
-Create a `.env` file in this folder if you want to enable the email contact flow:
+Create a `.env` file in `frontend/`:
 
 ```env
 VITE_EMAILJS_SERVICE_ID=your_service_id
@@ -49,35 +51,47 @@ VITE_EMAILJS_ADMIN_TEMPLATE_ID=your_admin_template_id
 VITE_EMAILJS_PUBLIC_KEY=your_public_key
 ```
 
-If the app is using a backend API, make sure the Django server is running before testing the UI.
+Make sure the Django backend is running at `http://127.0.0.1:8000` before interacting with API-backed pages.
 
-## Available scripts
-
-```bash
-npm run dev     # start Vite dev server
-npm run build   # type-check and build production bundle
-npm run lint    # run ESLint
-npm run preview # preview the built app locally
-```
-
-## Notes
-
-- The frontend expects the backend API under `/api/...`.
-- Authentication tokens are stored in `localStorage`.
-- API requests are centralized in the frontend service layer to handle JWT refresh logic.
-
-## Troubleshooting
-
-If the app does not load or API calls fail:
-
-1. confirm the backend is running on port 8000
-2. check browser devtools for network or CORS errors
-3. verify the `.env` values for EmailJS are populated only if email features are used
-
-## Production build
+### 3) Start the Development Server
 
 ```bash
-npm run build
+npm run dev
 ```
 
-This produces a production bundle in the `dist/` directory.
+The app will be available at `http://localhost:5173`.
+
+---
+
+## Available Scripts
+
+```bash
+npm run dev      # Start Vite development server with HMR
+npm test         # Run Jest unit tests
+npm run build    # Type-check (tsc -b) and build production bundle to dist/
+npm run lint     # Run ESLint across the codebase
+npm run preview  # Preview the production build locally
+```
+
+---
+
+## Testing with Jest
+
+Tests are colocated with components under `src/components/*.test.tsx` and configured via [jest.config.cjs](jest.config.cjs) and [tsconfig.app.json](tsconfig.app.json).
+
+If setting up testing dependencies for the first time, ensure React Testing Library and the JSDOM environment are installed:
+
+```bash
+npm install -D @testing-library/react @testing-library/jest-dom jest-environment-jsdom
+npm test
+```
+
+---
+
+## Architecture Notes
+
+- **API Layer (`src/services/api.ts` & `src/utils/ApiUrls.tsx`)**: All endpoint paths are defined in `ApiUrls` and handled by the centralized Axios service wrapper.
+- **State Contexts (`src/context/`)**:
+  - `AuthContext.tsx`: Manages current user session state.
+  - `CartContext.tsx`: Manages cart items, quantities, and total price calculation across sessions.
+- **Protected Routes (`src/routes/ProtectedRoute.tsx`)**: Guards management routes (`/albums`, `/photos`, `/orders`, `/users`, `/favourites`) and redirects unauthenticated visitors to `/`.
