@@ -3,10 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
 import api from '../services/api';
 import type { Photo } from '../interfaces/interfaces';
-
-import { MainHeader } from '../components/MainHeader';
 import { PhotoCarousel } from '../components/PhotoCarousel';
-import { MainFooter } from '../components/MainFooter';
 
 export const HomePage = () => {
     const { album_id } = useParams<{ album_id: string }>();
@@ -14,7 +11,7 @@ export const HomePage = () => {
 
     {/* Fetch photos from backend */ }
     const fetchPhotos = useCallback(async () => {
-        const url = album_id ? `${ApiUrls.getPhotos}?album_id=${album_id}` : ApiUrls.getPhotos;
+        const url = ApiUrls.getFeaturedPhotos;
         try {
             const data = await api.apiGet<Photo[]>(url);
             setPhotos(data);

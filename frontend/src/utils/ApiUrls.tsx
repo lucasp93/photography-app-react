@@ -2,6 +2,7 @@ export const ApiUrls = {
     createPhoto: '/api/photos/',
     getPhotos: '/api/photos/',
     getPhoto: '/api/photos/:id',
+    getFeaturedPhotos: '/api/photos/featured',
     deletePhoto: '/api/photos',
     updatePhoto: '/api/photos/:id',
     getFavoritePhotos: '/api/photos/favorites',

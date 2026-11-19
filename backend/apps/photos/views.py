@@ -1,12 +1,12 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.decorators import action, permission_classes
 from rest_framework import status, viewsets
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from ..photos.models import Photo
 from ..photos.serializers import PhotoSerializer
-
 
 
 class PhotoViewSet(viewsets.ModelViewSet):
@@ -47,6 +47,7 @@ class PhotoViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(featured=is_featured)
         return queryset
 
+
 class ToggleFavoriteView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -66,9 +67,19 @@ class ToggleFavoriteView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class UserFavoritePhotosView(APIView):
-    permission_classes = [IsAuthenticated]
 
+class FeaturedPhotosView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        queryset = Photo.objects.all().order_by("id")
+        queryset = queryset.filter(featured=True)
+        serializer = PhotoSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserFavoritePhotosView(APIView):
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def get(self, request):
         user = request.user
         # Query photos favorited by the user

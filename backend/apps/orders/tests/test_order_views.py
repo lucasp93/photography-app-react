@@ -4,7 +4,7 @@ from apps.orders.models import Order
 from django.utils import timezone
 
 
-def test_list_orders(jwt_auth_client):
+def test_list_orders(jwt_admin_client):
     Order.objects.create(
         order_number="ORD-5231",
         client_name="John Doe",
@@ -26,13 +26,13 @@ def test_list_orders(jwt_auth_client):
     )
 
     url = reverse("order-list")
-    response = jwt_auth_client.get(url)
+    response = jwt_admin_client.get(url)
 
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) == 2
 
 
-def test_create_order(jwt_auth_client):
+def test_create_order(jwt_admin_client):
     url = reverse("order-list")
     payload = {
         "order_number": "ORD-1234",
@@ -41,13 +41,13 @@ def test_create_order(jwt_auth_client):
         "client_contact": "+33612345678",
         "price": 200,
     }
-    response = jwt_auth_client.post(url, payload, format="json")
+    response = jwt_admin_client.post(url, payload, format="json")
 
     assert response.status_code == status.HTTP_201_CREATED
     assert Order.objects.filter(order_number="ORD-1234").exists()
 
 
-def test_filter_or_search_orders(jwt_auth_client):
+def test_filter_or_search_orders(jwt_admin_client):
     Order.objects.create(
         order_number="ORD-4321",
         client_name="Tom Joe",
@@ -59,7 +59,7 @@ def test_filter_or_search_orders(jwt_auth_client):
     )
 
     url = reverse("order-list")
-    response = jwt_auth_client.get(f"{url}?search=Joe")
+    response = jwt_admin_client.get(f"{url}?search=Joe")
 
     assert response.status_code == status.HTTP_200_OK
     assert len(response.data) == 1

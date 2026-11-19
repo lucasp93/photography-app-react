@@ -3,8 +3,6 @@ services:
     image: postgres:15
     env_file:
       - ./backend/.env
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -15,13 +13,12 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
 
-  backend:
+  app:
     build:
-      context: ./backend
-    image: lucasp93/photography-react-app:backend
+      context: .
+      dockerfile: Dockerfile
+    image: lucasp93/photography-react-app:latest
     env_file:
       - ./backend/.env
     environment:
@@ -30,18 +27,15 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/1
     ports:
-      - "8000:8000"
+      - "80:80"
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
-    command: >
-      sh -c "uv run --no-sync python manage.py migrate &&
-             uv run --no-sync uvicorn core.asgi:application --host 0.0.0.0 --port 8000"
 
   celery:
-    image: lucasp93/photography-react-app:backend
+    image: lucasp93/photography-react-app:latest
     env_file:
       - ./backend/.env
     environment:
@@ -55,15 +49,6 @@ services:
       redis:
         condition: service_started
     command: uv run --no-sync celery -A core worker -l info
-
-  frontend:
-    build:
-      context: ./frontend
-    image: lucasp93/photography-react-app:frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
 
 volumes:
   postgres_data:

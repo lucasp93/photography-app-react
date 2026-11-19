@@ -2,8 +2,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
-from django.db import transaction
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django_filters.rest_framework import DjangoFilterBackend
@@ -20,6 +20,7 @@ from ..users.serializers import UserSerializer
 
 User = get_user_model()
 
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def request_password_reset(request):
@@ -27,19 +28,19 @@ def request_password_reset(request):
     user = User.objects.filter(email__iexact=email).first() if email else None
 
     if user:
-        transaction.on_commit(
-            lambda: send_password_reset_email_task.delay(user.pk)
-        )
+        transaction.on_commit(lambda: send_password_reset_email_task.delay(user.pk))
 
     return Response(
         {"detail": "If an account exists for that email, a reset link will be sent."},
         status=status.HTTP_202_ACCEPTED,
     )
 
+
 class RequestPasswordResetView(APIView):
     """
     View to request a password reset email.
     """
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -51,7 +52,7 @@ class RequestPasswordResetView(APIView):
             token = default_token_generator.make_token(user)
 
             # Construct frontend react url
-            frontend_base = settings.FRONTEND_URL.rstrip('/')
+            frontend_base = settings.FRONTEND_URL.rstrip("/")
             reset_url = f"{frontend_base}/password/reset/confirm/{uuid}/{token}"
             # Dispatch email dispatch task to Celery worker
             send_password_reset_email_task.delay(user.email, reset_url)
@@ -59,7 +60,11 @@ class RequestPasswordResetView(APIView):
             # Prevent user enumeration by returning a generic response
             pass
 
-        return Response({"detail": "If an account exists with that email, a password reset link has been sent."})
+        return Response(
+            {
+                "detail": "If an account exists with that email, a password reset link has been sent."
+            }
+        )
 
 
 class ConfirmPasswordResetView(APIView):
@@ -82,7 +87,13 @@ class ConfirmPasswordResetView(APIView):
         try:
             user_id = force_str(urlsafe_base64_decode(uid))
             user = User.objects.get(pk=user_id)
-        except (TypeError, ValueError, OverflowError, UnicodeDecodeError, User.DoesNotExist):
+        except (
+            TypeError,
+            ValueError,
+            OverflowError,
+            UnicodeDecodeError,
+            User.DoesNotExist,
+        ):
             user = None
 
         if user is None or not default_token_generator.check_token(user, token):
@@ -103,6 +114,7 @@ class ConfirmPasswordResetView(APIView):
         user.save(update_fields=["password"])
         return Response({"detail": "Password has been reset successfully."})
 
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     Standard CRUD actions for Users
@@ -115,12 +127,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ["username", "email", "role", "last_login"]
-    search_fields = ["username", "email"] # Enable partial searching via ?search=
+    search_fields = ["username", "email"]  # Enable partial searching via ?search=
     ordering_fields = ["date_joined", "username"]
 
     def get_permissions(self):
         """
-        Instiated and returns the list of permissions that this view required. 
+        Instiated and returns the list of permissions that this view required.
         """
         if self.action in ["list", "retrieve"]:
             permission_classes = [AllowAny]
@@ -129,7 +141,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def me(self, request):
         """
         Returns the current user

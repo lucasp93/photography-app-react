@@ -58,7 +58,7 @@ def regular_user(user_factory):
 @pytest.fixture
 def admin_user(user_factory):
     """Returns an admin user instance."""
-    return user_factory(username="admin_user", email="admin@example", role="admin")
+    return user_factory(username="admin_user", email="admin@example", role="admin", is_staff=True)
 
 # ------------------------------------------------------------------
 # Authenticated Client Fixtures
@@ -92,5 +92,14 @@ def jwt_auth_client(api_client, regular_user):
 
     from rest_framework_simplejwt.tokens import RefreshToken
     refresh = RefreshToken.for_user(regular_user)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
+    return api_client
+
+
+@pytest.fixture
+def jwt_admin_client(api_client, admin_user):
+    """Simulates a real JWT authorization header for an admin/staff user."""
+    from rest_framework_simplejwt.tokens import RefreshToken
+    refresh = RefreshToken.for_user(admin_user)
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
     return api_client
