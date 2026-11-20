@@ -13,7 +13,7 @@ export const App: React.FC = () => {
       <AuthProvider>
         <CartProvider>
           <MainHeader />
-          <main className="flex-1">
+          <main className="flex-1 flex flex-col">
             <AppRoutes />
           </main>
           <MainFooter name="Photography App" year={2026} />

@@ -65,7 +65,7 @@ export const ContactPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-neutral-100 py-16 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="flex-1 bg-gray-100 text-neutral-800 py-8 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-6xl mx-auto">
 
         {/* Header Section */}
@@ -73,9 +73,9 @@ export const ContactPage: React.FC = () => {
           <div className="flex justify-center mb-4">
             <Camera className="w-10 h-10 text-neutral-400" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
+          <h3 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
             Let's Capture Memories
-          </h1>
+          </h3>
           <p className="mt-4 text-neutral-400 max-w-xl mx-auto text-sm md:text-base tracking-wider">
             Available for bookings worldwide. Fill out the form below or reach out directly to discuss your upcoming project.
           </p>

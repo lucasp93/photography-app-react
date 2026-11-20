@@ -69,7 +69,7 @@ export const DrawerContent: React.FC = () => {
             </List>
             <Divider />
             <Container className="flex flex-col align-center items-center w-full px-4 py-4">
-                <div className="flex justify-space-between gap-2 mb-2">
+                <div className="flex justify-between w-full gap-2 mb-2">
                     <span>TOTAL</span>
                     <span>${totalPrice > 0 ? totalPrice.toFixed(2) : 0.00}</span>
                 </div>

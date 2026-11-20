@@ -65,7 +65,7 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
   }, [isFavorited]);
 
   return (
-    <Card border="info" style={{ width: '18rem' }}>
+    <Card border="info" style={{ width: '100%', maxWidth: '18rem' }}>
       <Card.Img variant="top" src={photo?.url} />
       <Card.Body>
         <Card.Title>{photo?.name}</Card.Title>

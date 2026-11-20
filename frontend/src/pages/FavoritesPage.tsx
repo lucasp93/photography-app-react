@@ -48,13 +48,13 @@ export const FavouritesPage: React.FC = () => {
     if (error) return <p className="p-4 text-danger">Error: {error}</p>;
 
     return (
-        <div>
+        <div className="flex-1 flex flex-col">
             {/* <h4 className="mt-2 font-serif text-4l font-cursice text-center bg-transparent">{event_name?.toUpperCase()}</h4> */}
-            <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 pt-5 pb-5">
+            <div className="flex flex-col items-center justify-center flex-1 bg-gray-100 px-4 pt-5 pb-5">
                 {/* <CardGroup className="flex flex-wrap justify-center gap-4"> */}
                 {/* <h4 className={`mb-4 font-serif text-4l font-bold text-center bg-transparent ${isAuthenticated && user?.role === 'admin' ? 'mt-2' : ''}`}>{photo.album?.name?.toUpperCase()}</h4> */}
                 {favoritePhotos && favoritePhotos.length > 0 ?
-                    <Row xs={1} md={4} className="g-4 justify-center">
+                    <Row xs={1} sm={2} lg={3} xl={4} className="g-4 justify-content-center w-100">
                         {favoritePhotos.map((photo) => (
                             <Col key={photo.id} className="flex justify-center">
                                 <PhotoCard 

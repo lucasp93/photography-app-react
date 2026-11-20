@@ -106,24 +106,24 @@ export const PrintSizeModal: React.FC<{
                     aria-labelledby="print-size-modal"
                     aria-describedby="Photo print sizes"
                 >
-                    <Box sx={style}>
-                        <div className="flex w-full flex-row gap-4">
-                            <div className="w-1/3">
+                    <Box sx={{ ...style, overflowY: 'auto' }}>
+                        <div className="flex w-full flex-col md:flex-row gap-4">
+                            <div className="w-full md:w-1/3">
                                 <CardMedia
                                     component="img"
-                                    className="w-full h-full"
+                                    className="w-full h-full object-cover rounded"
                                     //sx={{ width: 90, height: 90, objectFit: 'cover' }}
                                     image={photo.url}
                                     alt={photo.name}
                                 />
                             </div>
-                            <div className="w-2/3">
+                            <div className="w-full md:w-2/3">
                                 <Typography variant="body1" className="font-bold">{photo.name}</Typography>
                                 <Typography variant="body2" className="text-neutral-500">
                                     {photo.album_name}
                                 </Typography>
                                 {/* <Typography variant="subtitle1">Select photo size</Typography> */}
-                                <Stack direction="row" spacing={4} className="block">
+                                <Stack direction="row" spacing={4} className="block mt-2">
                                     <ToggleButtonGroup
                                         orientation="horizontal"
                                         value={photoSize}
@@ -131,10 +131,9 @@ export const PrintSizeModal: React.FC<{
                                         onChange={handleSizeChange}
                                         aria-label="photo size selector"
                                         sx={{
-                                            display: 'grid',
-                                            gridTemplateRows: 'repeat(3, auto)',
-                                            gridAutoFlow: 'column',
-                                            justifyContent: 'start',
+                                            display: 'flex',
+                                            flexWrap: 'wrap',
+                                            gap: 1,
                                         }}
                                     >
                                         {photoSizesArray.map((size) => (
@@ -153,7 +152,7 @@ export const PrintSizeModal: React.FC<{
                                 </div>
                             ) :
                             (
-                                <div className="flex flex-col items-center justify-end gap-2">
+                                <div className="flex flex-col items-center justify-end gap-2 mt-2">
                                     <Button onClick={handleChangeSize}>Change size</Button>
                                 </div>
                             )

@@ -17,9 +17,9 @@ export const CheckoutPage: React.FC = () => {
 
     return (
         <>
-            <Box className="flex flex-col gap-2 p-3 w-3/4 m-auto">
-                <Stack spacing={2} direction="row" className="justify-between">
-                    <Box component="section" className="w-2/3">
+            <Box className="flex flex-col gap-2 p-3 w-full max-w-6xl m-auto">
+                <Stack spacing={3} direction={{ xs: 'column', md: 'row' }} className="justify-between">
+                    <Box component="section" className="w-full md:w-2/3">
                         <List>
                             <ListSubheader sx={{ fontColor: 'darkGrey', fontSize: '1.5rem', marginBottom: '4px' }}>
                                 Cart Items ({items?.length} {items.length > 1 ? 'photos' : 'photo'})
@@ -33,36 +33,38 @@ export const CheckoutPage: React.FC = () => {
                             </ListGroup>
                         </List>
                     </Box>
-                    <Box component="section" className="w-1/3">
+                    <Box component="section" className="w-full md:w-1/3">
                         <List>
                             <ListSubheader sx={{ fontColor: 'darkGrey', fontSize: '1.5rem', marginBottom: '4px' }}>Resume</ListSubheader>
                             <Divider />
-                            <ListGroupItem className="border border-neutral-400 rounded-xl p-2">
-                                <ListItem className="flex flex-row px-4" sx={{ justifyContent: 'space-between' }}>
-                                    <p>Subtotal</p>
-                                    <span>$ {totalPrice.toFixed(2)}</span>
-                                </ListItem>
-                                <ListItem className="flex flex-row px-4" sx={{ justifyContent: 'space-between' }}>
-                                    <p>Discount</p>
-                                    <span>$ 0.00</span>
-                                </ListItem>
-                                <ListItem className="flex flex-row px-4" sx={{ justifyContent: 'space-between' }}>
-                                    <p>Total</p>
-                                    <span>$ {totalPrice.toFixed(2)}</span>
-                                </ListItem>
-                                <ListItem className="flex flex-col">
-                                    <FinishOrderModal
-                                        trigger={
-                                            <Button variant="dark" className="w-70 border rounded-full">Finish order</Button>
-                                        }
-                                    />
-                                </ListItem>
-                                <ListItem className="flex flex-col">
-                                    <Link href="/" sx={{ fontSize: '15px', color: 'grey', textDecoration: 'none', '&:hover': { color: 'lightgrey', textDecoration: 'none' } }}>
-                                        Keep shopping &gt;
-                                    </Link>
-                                </ListItem>
-                            </ListGroupItem>
+                            <div className="border border-neutral-400 rounded-xl p-2 bg-white">
+                                <ListGroupItem>
+                                    <ListItem className="flex flex-row px-4" sx={{ justifyContent: 'space-between' }}>
+                                        <p>Subtotal</p>
+                                        <span>$ {totalPrice.toFixed(2)}</span>
+                                    </ListItem>
+                                    <ListItem className="flex flex-row px-4" sx={{ justifyContent: 'space-between' }}>
+                                        <p>Discount</p>
+                                        <span>$ 0.00</span>
+                                    </ListItem>
+                                    <ListItem className="flex flex-row px-4" sx={{ justifyContent: 'space-between' }}>
+                                        <p>Total</p>
+                                        <span>$ {totalPrice.toFixed(2)}</span>
+                                    </ListItem>
+                                    <ListItem className="flex flex-col">
+                                        <FinishOrderModal
+                                            trigger={
+                                                <Button variant="dark" className="w-full border rounded-full">Finish order</Button>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <ListItem className="flex flex-col">
+                                        <Link href="/" sx={{ fontSize: '15px', color: 'grey', textDecoration: 'none', '&:hover': { color: 'lightgrey', textDecoration: 'none' } }}>
+                                            Keep shopping &gt;
+                                        </Link>
+                                    </ListItem>
+                                </ListGroupItem>
+                            </div>
                         </List>
                     </Box>
                 </Stack>

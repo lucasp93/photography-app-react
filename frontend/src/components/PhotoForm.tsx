@@ -50,7 +50,7 @@ export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
     }, [fetchAlbumData]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-100">
+        <div className="flex flex-col items-center justify-center flex-1 bg-neutral-100 px-4 py-6">
             {/* <h3 className="text-neutral-600 font-bold">{album?.name}</h3> */}
             <Form className="w-full max-w-3xl bg-gray-200 border-solid rounded-md p-8 shadow-md" onSubmit={handleSubmit}>
                 <p className="text-neutral-600 text-2xl font-bold mb-2">Add photo</p>
@@ -76,7 +76,7 @@ export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
                     {/* <Form.Label>Url</Form.Label> */}
                     <Form.Control type="text" placeholder="Enter url" name="url" required />
                 </Form.Group>
-                <Form.Group className="mb-3 flex flex-row justify-left" controlId="formBasicEvent">
+                <Form.Group className="mb-3 flex flex-row justify-start" controlId="formBasicEvent">
                     <Form.Label>Featured</Form.Label>
                     <Form.Check className="ml-2" type="checkbox" name="featured" defaultChecked={false} />
                 </Form.Group>

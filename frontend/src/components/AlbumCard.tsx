@@ -51,7 +51,7 @@ export const AlbumCard: React.FC<AlbumCardProps> = ({
     if (loading) return <p>Loading items...</p>
     if (error) return <p>Error: {error}</p>
     return (
-        <Card border="info" style={{ width: '18rem' }} onClick={handleAlbumClick}>
+        <Card border="secondary" bg="light" className="w-full max-w-72 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleAlbumClick}>
             <Card.Img variant="top" src={featured[0]?.url || 'https://picsum.photos/id/237/1200/800.jpg'} />
             <Card.Body>
                 <Card.Title>{album?.name}</Card.Title>

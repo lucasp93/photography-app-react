@@ -1,16 +1,14 @@
-import { List } from '@mui/material';
 import React from 'react';
-import { Card, CardGroup } from 'react-bootstrap';
-import { ListGroup } from 'react-bootstrap';
+import { Card, ListGroup } from 'react-bootstrap';
 
 export const ExperiencePage: React.FC = () => {
     return (
-        <div className="flex flex-col items-center min-h-screen bg-gray-100">
-            <h1 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
+        <div className="flex flex-col items-center flex-1 bg-gray-100 py-6">
+            <h3 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
                 Experiences
-            </h1>
-            <CardGroup className="flex flex-wrap justify-center gap-4 mt-4 mb-4 px-4">
-                <Card>
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-4 px-4 w-full max-w-7xl">
+                <Card border="secondary">
                     {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
                     <Card.Header>The journey from start to gallery</Card.Header>
                     <Card.Body>
@@ -36,7 +34,7 @@ export const ExperiencePage: React.FC = () => {
                         <small className="text-muted">Last updated 3 mins ago</small>
                     </Card.Footer> */}
                 </Card>
-                <Card>
+                <Card border="secondary">
                     {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
                     <Card.Header>What Working Together Feels Like</Card.Header>
                     <Card.Body>
@@ -62,7 +60,7 @@ export const ExperiencePage: React.FC = () => {
                         <small className="text-muted">Last updated 3 mins ago</small>
                     </Card.Footer> */}
                 </Card>
-                <Card>
+                <Card border="secondary">
                     {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
                     <Card.Header>Our Production Process</Card.Header>
                     <Card.Body>
@@ -88,7 +86,7 @@ export const ExperiencePage: React.FC = () => {
                         <small className="text-muted">Last updated 3 mins ago</small>
                     </Card.Footer> */}
                 </Card>
-            </CardGroup>
+            </div>
         </div>
     )
 }

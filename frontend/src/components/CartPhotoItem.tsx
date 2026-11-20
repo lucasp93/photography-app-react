@@ -46,7 +46,7 @@ export const CartPhotoItem: React.FC<CardPhotoItemProps> = ({ photo, size, price
     const cartItem = items.find((item) => item.photo.id === photo.id && item.size === size);
     const itemTotal = cartItem ? cartItem.price * cartItem.quantity : 0;
     return (
-        <Card className="grid w-full max-h-40 grid-cols-[96px_minmax(0,1fr)_72px] items-center gap-3 rounded-none border-gray-200 px-2 py-3 shadow-none">
+        <Card className="grid w-full grid-cols-[96px_minmax(0,1fr)_72px] items-center gap-3 rounded-none border-gray-200 px-2 py-3 shadow-none">
             {component === 'drawer' ?
                 <>
                     <CardMedia
@@ -87,7 +87,7 @@ export const CartPhotoItem: React.FC<CardPhotoItemProps> = ({ photo, size, price
                             <QuantitySelector photo={photo} size={size} />
                         </Box>
 
-                        <Box className="flex flex-col items-start h-full m-w-0 text-start">
+                        <Box className="flex flex-col items-start h-full min-w-0 text-start">
                             <CardContent className="flex flex-col flex-1 p-0">
                                 <Typography variant="body1">{photo.name}</Typography>
                                 <Typography variant="body2" className="text-neutral-500">

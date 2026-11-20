@@ -49,7 +49,7 @@ export const ResetPasswordRequestPage = () => {
     };
 
     return (
-        <main className="min-h-screen bg-gray-100 text-neutral-100 px-4 py-16 flex items-center justify-center">
+        <main className="flex-1 bg-gray-100 text-neutral-800 px-4 py-8 flex items-center justify-center">
             <section className="w-full max-w-md border border-neutral-800 rounded-2xl bg-neutral-200/50 p-8">
                 <Mail className="w-8 h-8 text-neutral-500 mb-6" />
                 <h1 className="text-2xl font-normal mb-2">Reset your password</h1>

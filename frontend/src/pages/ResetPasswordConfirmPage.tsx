@@ -97,12 +97,12 @@ export const ResetPasswordConfirmPage: React.FC = () => {
     // };
 
     return (
-        <div>
-            <div className="min-h-screen bg-gray-100 text-neutral-100 py-16 px-4 sm:px-6 lg:px-8 font-sans">
+        <div className="flex-1 flex flex-col">
+            <div className="flex-1 bg-gray-100 text-neutral-800 py-8 px-4 sm:px-6 lg:px-8 font-sans">
                 <div className="max-w-6xl mx-auto flex flex-col items-center justify-center">
 
                     {/* Header Section */}
-                    <div className="text-center mb-16">
+                    <div className="text-center mb-8">
                         <div className="flex justify-center mb-4">
                             <User className="w-10 h-10 text-neutral-400" />
                         </div>
@@ -111,9 +111,9 @@ export const ResetPasswordConfirmPage: React.FC = () => {
                         </h1> */}
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 w-full max-w-2xl">
+                    <div className="w-full max-w-lg mx-auto">
                         {/* Form Section */}
-                        <div className="lg:col-span-2 flex flex-col items-center justify-center bg-neutral-200/50 p-8 rounded-2xl border border-neutral-800">
+                        <div className="flex flex-col items-center justify-center bg-neutral-200/50 p-6 sm:p-8 rounded-2xl border border-neutral-800">
                             {isSubmitted ? (
                                 <div className="h-full flex flex-col items-center justify-center text-center py-12">
                                     <CheckCircle2 className="w-16 h-16 text-emerald-500 mb-4 animate-bounce" />
