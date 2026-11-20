@@ -57,14 +57,13 @@ export const NavMenu: React.FC<{ page: typeof pages[0] }> = ({ page }) => {
     };
 
     return (
-        <Box
-            onMouseLeave={handleClose}
-            sx={{ display: 'inline-block' }}
-        >
+        <Box sx={{ display: 'inline-block' }}>
             <Button
                 onMouseEnter={handleOpen}
-                onClick={() => {
-                    if (!page.items) {
+                onClick={(event) => {
+                    if (page.items) {
+                        handleOpen(event);
+                    } else {
                         handleNavigate(page.path);
                     }
                 }}
@@ -78,15 +77,6 @@ export const NavMenu: React.FC<{ page: typeof pages[0] }> = ({ page }) => {
                     anchorEl={anchorEl}
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
-                    // 2. Added onMouseEnter to Paper to keep menu open while moving mouse
-                    sx={{ pointerEvents: 'none' }}
-                    slotProps={{
-                        paper: {
-                            onMouseEnter: () => setAnchorEl(anchorEl),
-                            sx: { pointerEvents: 'auto', mt: 1.5 }
-                        },
-                        backdrop: { sx: { display: 'none' } }
-                    }}
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
                     transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                 >
@@ -110,7 +100,6 @@ export const MainHeader: React.FC = () => {
     const navigate = useNavigate(); // Hook enabled
 
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElNav(event.currentTarget);
-    // const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElUser(event.currentTarget);
     const handleCloseNavMenu = () => setAnchorElNav(null);
     const handleCloseUserMenu = () => setAnchorElUser(null);
 
@@ -144,25 +133,40 @@ export const MainHeader: React.FC = () => {
                     <IconButton size="medium" onClick={() => navigate('/')} color="inherit" title="Home">
                         <CameraIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
                     </IconButton>
-                    {/* <Typography
-                        variant="h6"
-                        component="div"
-                        onClick={() => navigate('/')}
-                        sx={{ mr: 2, display: { xs: 'none', md: 'flex' }, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '.3rem', color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}>
-                        Home
-                    </Typography> */}
-
                     <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
                         <IconButton size="large" onClick={handleOpenNavMenu} color="inherit"><MenuIcon /></IconButton>
                         <Menu anchorEl={anchorElNav} open={Boolean(anchorElNav)} onClose={handleCloseNavMenu} sx={{ display: { xs: 'block', md: 'none' } }}>
-                            {pages.map((page) => (
-                                <MenuItem key={page.label} onClick={() => {
-                                    handleCloseNavMenu();
-                                    navigate(page.path);
-                                }}>
-                                    <Typography sx={{ textAlign: "center" }}>{page.label}</Typography>
-                                </MenuItem>
-                            ))}
+                            {pages.map((page) =>
+                                page.items ? (
+                                    [
+                                        <MenuItem key={page.label} disabled>
+                                            <Typography sx={{ fontWeight: 'bold' }}>{page.label}</Typography>
+                                        </MenuItem>,
+                                        ...page.items.map((item) => (
+                                            <MenuItem
+                                                key={item.label}
+                                                sx={{ pl: 4 }}
+                                                onClick={() => {
+                                                    handleCloseNavMenu();
+                                                    navigate(item.path);
+                                                }}
+                                            >
+                                                <Typography>{item.label}</Typography>
+                                            </MenuItem>
+                                        )),
+                                    ]
+                                ) : (
+                                    <MenuItem
+                                        key={page.label}
+                                        onClick={() => {
+                                            handleCloseNavMenu();
+                                            navigate(page.path);
+                                        }}
+                                    >
+                                        <Typography>{page.label}</Typography>
+                                    </MenuItem>
+                                )
+                            )}
                         </Menu>
                     </Box>
 
@@ -174,20 +178,6 @@ export const MainHeader: React.FC = () => {
 
                     <Box sx={{ flexGrow: 0 }}>
                         <UserDropdownComponent />
-                        {/* <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="User" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
-                        </Tooltip>
-                        <Menu sx={{ mt: '45px' }} anchorEl={anchorElUser} open={Boolean(anchorElUser)} onClose={handleCloseUserMenu} anchorOrigin={{ vertical: 'top', horizontal: 'right' }} transformOrigin={{ vertical: 'top', horizontal: 'right' }}>
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={() => {
-                                    handleUserMenuClick(setting);
-                                }}>
-                                    <Typography sx={{ textAlign: "center" }}>{setting}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu> */}
                     </Box>
                 </Toolbar>
             </Container>

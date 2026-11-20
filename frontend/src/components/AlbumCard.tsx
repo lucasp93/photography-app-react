@@ -63,8 +63,6 @@ export const AlbumCard: React.FC<AlbumCardProps> = ({
                 <Card.Body>
                     <IconButton size="medium" color="inherit" aria-label="Favourite"><FavoriteBorderIcon /></IconButton>
                     <IconButton size="medium" color="inherit" aria-label="Cart"><ShoppingBagIcon /></IconButton>
-                    {/* <Card.Link href="#">Card Link</Card.Link>
-                <Card.Link href="#">Another Link</Card.Link> */}
                 </Card.Body>
                 : null}
         </Card>
