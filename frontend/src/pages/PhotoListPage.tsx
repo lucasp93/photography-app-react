@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
 import type { Photo, Album } from '../interfaces/interfaces';
-import { Table, Button, Form, Card, Row, Col, Pagination } from 'react-bootstrap';
+import { Table, Button, Form, Card, Row, Col } from 'react-bootstrap';
 import api from '../services/api';
-import { createPhoto, deleteItem } from '../services/utils';
+import { createPhoto, deletePhoto } from '../services/photoService';
+import { PaginationBar } from '../components/PaginationBar';
 
 export const PhotoListPage: React.FC = () => {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -127,8 +128,7 @@ export const PhotoListPage: React.FC = () => {
 
     // Delete Item Handler
     const handleDeleteItem = async (id: number) => {
-        const url = id ? (ApiUrls.deletePhoto ? ApiUrls.deletePhoto.replace(':id', id.toString()) : '') : '';
-        const response = await deleteItem(url, id);
+        const response = await deletePhoto(id);
 
         if (response) {
             setStatus('success');
@@ -148,78 +148,9 @@ export const PhotoListPage: React.FC = () => {
         }
     };
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
     const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setItemsPerPage(Number(e.target.value));
         setCurrentPage(1); // Reset to page 1 on limit change
-    };
-
-    // Helper function to generate pagination items with ellipsis (...)
-    const renderPaginationItems = () => {
-        const pageItems = [];
-        const maxVisiblePages = 5;
-
-        if (totalPages <= maxVisiblePages + 2) {
-            for (let i = 1; i <= totalPages; i++) {
-                pageItems.push(
-                    <Pagination.Item
-                        key={i}
-                        active={i === currentPage}
-                        onClick={() => handlePageChange(i)}
-                    >
-                        {i}
-                    </Pagination.Item>
-                );
-            }
-        } else {
-            pageItems.push(
-                <Pagination.Item
-                    key={1}
-                    active={1 === currentPage}
-                    onClick={() => handlePageChange(1)}
-                >
-                    1
-                </Pagination.Item>
-            );
-
-            let startPage = Math.max(2, currentPage - 1);
-            let endPage = Math.min(totalPages - 1, currentPage + 1);
-
-            if (startPage > 2) {
-                pageItems.push(<Pagination.Ellipsis key="left-ellipsis" disabled />);
-            }
-
-            for (let i = startPage; i <= endPage; i++) {
-                pageItems.push(
-                    <Pagination.Item
-                        key={i}
-                        active={i === currentPage}
-                        onClick={() => handlePageChange(i)}
-                    >
-                        {i}
-                    </Pagination.Item>
-                );
-            }
-
-            if (endPage < totalPages - 1) {
-                pageItems.push(<Pagination.Ellipsis key="right-ellipsis" disabled />);
-            }
-
-            pageItems.push(
-                <Pagination.Item
-                    key={totalPages}
-                    active={totalPages === currentPage}
-                    onClick={() => handlePageChange(totalPages)}
-                >
-                    {totalPages}
-                </Pagination.Item>
-            );
-        }
-
-        return pageItems;
     };
 
     if (status === 'loading') return <p className="p-4">Loading items...</p>;
@@ -430,33 +361,12 @@ export const PhotoListPage: React.FC = () => {
                 {/* Card Footer with Ellipsis Pagination */}
                 {totalPages > 1 && (
                     <Card.Footer className="bg-white d-flex justify-content-between align-items-center py-3">
-                        <div className="text-muted small">
-                            Showing <strong>{indexOfFirstItem + 1}</strong> to{' '}
-                            <strong>{Math.min(indexOfLastItem, totalItems)}</strong> of{' '}
-                            <strong>{totalItems}</strong> entries
-                        </div>
-
-                        <Pagination className="mb-0">
-                            <Pagination.First
-                                onClick={() => handlePageChange(1)}
-                                disabled={currentPage === 1}
-                            />
-                            <Pagination.Prev
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            />
-
-                            {renderPaginationItems()}
-
-                            <Pagination.Next
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            />
-                            <Pagination.Last
-                                onClick={() => handlePageChange(totalPages)}
-                                disabled={currentPage === totalPages}
-                            />
-                        </Pagination>
+                        <PaginationBar
+                            totalItems={totalItems}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
                     </Card.Footer>
                 )}
             </Card>

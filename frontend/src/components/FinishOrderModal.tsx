@@ -45,9 +45,21 @@ interface FinishOrderFormProps {
     totalPrice: number;
 }
 
+export interface CreateOrderPayload {
+    client_name: string;
+    client_email: string;
+    client_contact: string;
+    photo_ids: (string | number)[];
+    price: number;
+}
+
+const defaultCreateOrder = (order: CreateOrderPayload): Promise<unknown> =>
+    api.apiPost(ApiUrls.createOrder, order);
+
 export const FinishOrderModal: React.FC<{
     trigger?: React.ReactNode;
-}> = ({ trigger }) => {
+    onSubmitOrder?: (order: CreateOrderPayload) => Promise<unknown>;
+}> = ({ trigger, onSubmitOrder = defaultCreateOrder }) => {
     const [open, setOpen] = useState(false);
     const handleOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
@@ -116,33 +128,13 @@ export const FinishOrderModal: React.FC<{
         }
 
         try {
-            const url = ApiUrls.createOrder;
             // Create order
-            const response = await api.apiPost(url, newOrder);
+            await onSubmitOrder(newOrder);
 
             setSuccessMessage('Order created successfully!');
             clearCart();
             setOpen(false);
             navigate('/');
-            // Send confirmation email
-            // const emailContent = {
-            //     name: formData.clientName,
-            //     subject: 'Order Confirmation',
-            //     email: formData.clientEmail,
-            //     contact: formData.clientContact ? formData.clientContact : 'No contact data provided.',
-            //     message: `Thank you for your order! Your order ID is ${response.order_id}. Total price: $${totalPrice.toFixed(2)}.`
-            // }
-            // const isEmailSent = await sendEmail(emailContent);
-            // console.log('is email sent? ', isEmailSent);
-            // if (isEmailSent) {
-            //     setSuccessMessage('Order created successfully!');
-            //     // Clear cart and close modal
-            //     clearCart();
-            //     setOpen(false);
-            //     navigate('/');
-            // } else {
-            //     setErrorMessage('Order created, but failed to send confirmation email.');
-            // }
         } catch (err) {
             console.log('error message: ', errorMessage);
             console.log('Error creating order: ', err);

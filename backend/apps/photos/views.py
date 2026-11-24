@@ -1,6 +1,8 @@
+from rest_framework.decorators import permission_classes
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.response import Response
-from rest_framework.decorators import action, permission_classes
+from rest_framework.decorators import action
 from rest_framework import status, viewsets
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -16,11 +18,13 @@ class PhotoViewSet(viewsets.ModelViewSet):
 
     permission_classes = [IsAuthenticated]
 
-    queryset = Photo.objects.select_related("album").prefetch_related("orders")
+    queryset = (
+        Photo.objects.select_related("album").prefetch_related("orders").order_by("id")
+    )
     serializer_class = PhotoSerializer
 
-    filter_backends = [SearchFilter, OrderingFilter]
-    filterset_fields = ["name", "author"]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ["name", "author", "album_id", "featured"]
     search_fields = ["name", "author"]
     ordering_fields = ["created_at", "name"]
 
@@ -35,17 +39,6 @@ class PhotoViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        album_id = self.request.query_params.get("album_id")
-        featured = self.request.query_params.get("featured")
-        if album_id:
-            queryset = queryset.filter(album_id=album_id)
-        if featured is not None:
-            is_featured = featured.lower() in ["true", "1"]
-            queryset = queryset.filter(featured=is_featured)
-        return queryset
 
 
 class ToggleFavoriteView(APIView):
@@ -79,7 +72,8 @@ class FeaturedPhotosView(APIView):
 
 
 class UserFavoritePhotosView(APIView):
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
         user = request.user
         # Query photos favorited by the user

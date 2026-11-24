@@ -119,11 +119,9 @@ describe('FinishOrderModal Component', () => {
             user: {
                 id: 1,
                 username: 'jdoe',
-                password: '',
                 first_name: 'Jane',
                 last_name: 'Doe',
                 email: 'jane.doe@example.com',
-                last_login: '',
                 role: 'user',
             },
         } as unknown as ReturnType<typeof useAuth>);

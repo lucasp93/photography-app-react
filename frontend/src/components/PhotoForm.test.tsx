@@ -19,11 +19,13 @@ jest.mock('../services/api', () => ({
     default: {
         apiGet: jest.fn(),
         apiPost: jest.fn(),
+        apiPut: jest.fn(),
     },
 }));
 
 const mockedApiGet = api.apiGet as jest.MockedFunction<typeof api.apiGet>;
 const mockedApiPost = api.apiPost as jest.MockedFunction<typeof api.apiPost>;
+const mockedApiPut = api.apiPut as jest.MockedFunction<typeof api.apiPut>;
 
 const mockAlbum: Album = {
     id: 5,
@@ -148,7 +150,7 @@ describe('PhotoForm Component', () => {
 
     test('uses updatePhoto URL when action is not create', async () => {
         mockedApiGet.mockResolvedValueOnce(mockAlbum);
-        mockedApiPost.mockResolvedValueOnce({ id: 12 });
+        mockedApiPut.mockResolvedValueOnce({ id: 12 });
 
         render(<PhotoForm action="update" />);
 
@@ -169,7 +171,7 @@ describe('PhotoForm Component', () => {
         fireEvent.submit(screen.getByRole('button', { name: 'Submit' }).closest('form')!);
 
         await waitFor(() => {
-            expect(mockedApiPost).toHaveBeenCalledWith(ApiUrls.updatePhoto, {
+            expect(mockedApiPut).toHaveBeenCalledWith(ApiUrls.updatePhoto, {
                 name: 'Updated Shot',
                 url: 'https://example.com/updated.jpg',
                 author: 'Jane Doe',

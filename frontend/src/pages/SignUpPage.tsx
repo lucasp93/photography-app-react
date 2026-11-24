@@ -5,7 +5,7 @@ import { UserPlus, CheckCircle2 } from 'lucide-react';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
-import { createUser } from '../services/utils';
+import { createUser } from '../services/userService';
 import type { User } from '../interfaces/interfaces';
 
 export interface SignUpFormData {
@@ -210,8 +210,8 @@ export const SignUpPage: React.FC = () => {
                                                     onBlur={() => setConfirmPasswordTouched(true)}
                                                     placeholder="Confirm Password"
                                                     className={`w-full bg-neutral-100 rounded-lg pl-4 pr-10 py-3 text-sm placeholder-neutral-600 focus:outline-none transition ${isPasswordMismatch
-                                                            ? 'border-2 border-red-500 text-red-500 focus:border-red-500'
-                                                            : 'border border-neutral-800 text-neutral-500 focus:border-neutral-500'
+                                                        ? 'border-2 border-red-500 text-red-500 focus:border-red-500'
+                                                        : 'border border-neutral-800 text-neutral-500 focus:border-neutral-500'
                                                         }`}
                                                 />
                                                 <button

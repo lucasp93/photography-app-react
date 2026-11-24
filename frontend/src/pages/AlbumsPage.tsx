@@ -7,7 +7,7 @@ import { AlbumCard } from '../components/AlbumCard';
 import { ApiUrls } from '../utils/ApiUrls';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Alert from 'react-bootstrap/Alert';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useAuth } from '../context/AuthContext';
 
@@ -49,7 +49,7 @@ export const AlbumPage: React.FC = () => {
     };
 
     if (loading) return <p>Loading items...</p>
-    if (error) return <p>Error: {error}</p>
+    { error && <Alert severity="error">{error}</Alert> }
     return (
         <div className="flex-1 flex flex-col">
             {/* <h4 className="mt-2 font-serif text-4l font-cursice text-center bg-transparent">{event_name?.toUpperCase()}</h4> */}
@@ -68,7 +68,7 @@ export const AlbumPage: React.FC = () => {
                             </Col>
                         ))}
                     </Row> :
-                    <Alert variant="light">
+                    <Alert severity="info">
                         <p>No albums found</p>
                     </Alert>}
             </div>

@@ -8,6 +8,8 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { PrintSizeModal } from './PrintSizeModal';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export interface PhotoCardProps {
   photo: Photo | null;
@@ -15,20 +17,30 @@ export interface PhotoCardProps {
   showAlbum?: boolean;
   showLinks?: boolean;
   onFavoriteChange?: (photoId: number, newStatus: boolean) => void;
+  toggleFavorite?: (photoId: string | number) => Promise<{ is_favorited: boolean }>;
 }
 
+const defaultToggleFavorite = (photoId: string | number): Promise<{ is_favorited: boolean }> =>
+  api.apiPost(`/api/photos/${photoId}/favorite`, {});
 
 export const PhotoCard: React.FC<PhotoCardProps> = ({
   photo = null,
   isFavorited = false,
   showAlbum = false,
   showLinks = true,
-  onFavoriteChange
+  onFavoriteChange,
+  toggleFavorite = defaultToggleFavorite,
 }) => {
   const [favorited, setFavorited] = useState<boolean>(isFavorited);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const handleFavoriteToggle = async () => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location.pathname } });
+      return;
+    }
     if (isLoading || !photo) return;
     setIsLoading(true);
     // Optimistic UI update for instant feedback
@@ -36,7 +48,7 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
     const newOptimisticState = !previousSatate;
     setFavorited(!newOptimisticState);
     try {
-      const data = await api.apiPost(`/api/photos/${photo?.id}/favorite`, {});
+      const data = await toggleFavorite(photo.id);
       const actualServerStatus = data.is_favorited;
       setFavorited(actualServerStatus);
 

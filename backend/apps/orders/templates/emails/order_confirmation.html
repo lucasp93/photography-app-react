@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Order Confirmation</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; background-color: #f4f4f4; margin: 0; padding: 20px;">
+        <div style="max-width: 600px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #111; margin-top: 0;">Order Confirmation</h2>
+            <p>Hi <strong>{{ order.client_name }}</strong>,</p>
+            <p>Thank you for your order! We have received your request and will process it shortly.</p>
+
+            <div style="background-color: #f9fafb; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #e5e7eb;">
+                <p style="margin: 4px 0;"><strong>Order Number:</strong> {{ order.order_number }}</p>
+                <p style="margin: 4px 0;"><strong>Total Price:</strong> ${{ order.price|floatformat:2 }}</p>
+            </div>
+
+            <h3 style="font-size: 16px; margin-top: 25px; border-bottom: 2px solid #eee; padding-bottom: 8px;">Order Details</h3>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px;">
+                <thead>
+                    <tr style="background-color: #f8fafc; text-align: left;">
+                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Photo</th>
+                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Album &amp; Author</th>
+                        <th style="padding: 10px; border-bottom: 2px solid #ddd;">Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for photo in photos %}
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ photo.name }}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">
+                            {% if photo.album %}{{ photo.album.name }} <span style="color: #666;">by {{ photo.album.author }}</span>{% endif %}
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">{{ photo.size }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="padding: 10px; color: #666;">No photos attached to this order.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p style="margin-top: 30px; color: #666; font-size: 13px;">If you have any questions or need assistance, feel free to reply directly to this email.</p>
+            <p style="color: #999; font-size: 12px; margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px;">Photo Gallery App &copy; 2026</p>
+        </div>
+    </body>
+</html>

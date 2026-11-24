@@ -16,7 +16,7 @@ export const App: React.FC = () => {
           <main className="flex-1 flex flex-col">
             <AppRoutes />
           </main>
-          <MainFooter name="Photography App" year={2026} />
+          <MainFooter name="Photography App" />
         </CartProvider>
       </AuthProvider>
     </BrowserRouter>

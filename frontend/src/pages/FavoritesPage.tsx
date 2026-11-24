@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import type { Photo } from '../interfaces/interfaces';
-import { getUserFavoritePhotos } from '../services/utils';
+import { getUserFavoritePhotos } from '../services/photoService';
 import { useAuth } from '../context/AuthContext';
 import { PhotoCard } from '../components/PhotoCard';
 import Row from 'react-bootstrap/Row';
@@ -20,7 +20,7 @@ export const FavouritesPage: React.FC = () => {
     const fetchFavoritePhotos = useCallback(async () => {
         let favorite_photos: Photo[] | null = [];
         try {
-            favorite_photos = await getUserFavoritePhotos(Number(user?.id));
+            favorite_photos = await getUserFavoritePhotos();
         } catch (err: any) {
             setError(err.message || 'Failed to fetch favorite photos');
             setStatus('error');
@@ -37,7 +37,7 @@ export const FavouritesPage: React.FC = () => {
     }, [fetchFavoritePhotos]);
 
     // Callback passed to PhotoCard component to remove unfavorite items instantly
-    const handleFavoriteChange= (photoId: number, newStatus: boolean) => {
+    const handleFavoriteChange = (photoId: number, newStatus: boolean) => {
         if (!newStatus) {
             // If user unfavorited the photo, filter it out of the list
             setFavoritePhotos((prevPhotos) => prevPhotos.filter((p) => p.id !== photoId));
@@ -57,11 +57,11 @@ export const FavouritesPage: React.FC = () => {
                     <Row xs={1} sm={2} lg={3} xl={4} className="g-4 justify-content-center w-100">
                         {favoritePhotos.map((photo) => (
                             <Col key={photo.id} className="flex justify-center">
-                                <PhotoCard 
-                                    key={photo.id} 
-                                    photo={photo} 
-                                    isFavorited={photo.is_favorited ? true : false} 
-                                    showAlbum={true} 
+                                <PhotoCard
+                                    key={photo.id}
+                                    photo={photo}
+                                    isFavorited={photo.is_favorited ? true : false}
+                                    showAlbum={true}
                                     showLinks={true}
                                     onFavoriteChange={handleFavoriteChange} />
                             </Col>

@@ -116,10 +116,10 @@ CELERY_BROKER_URL=redis://localhost:6379/0
 CELERY_RESULT_BACKEND=redis://localhost:6379/1
 
 # Leave EMAIL_HOST empty in local dev to print emails to console, or set SMTP credentials:
-EMAIL_HOST=
+EMAIL_HOST=smtp-mail.outlook.com or smtp.gmail.com
 EMAIL_PORT=587
-EMAIL_HOST_USER=
-EMAIL_HOST_PASSWORD=
+EMAIL_HOST_USER=[host_user]
+EMAIL_HOST_PASSWORD=[host_password]
 EMAIL_USE_TLS=true
 EMAIL_USE_SSL=false
 DEFAULT_FROM_EMAIL=noreply@localhost

@@ -1,4 +1,5 @@
 export const ApiUrls = {
+    // Photos
     createPhoto: '/api/photos/',
     getPhotos: '/api/photos/',
     getPhoto: '/api/photos/:id',
@@ -6,16 +7,19 @@ export const ApiUrls = {
     deletePhoto: '/api/photos',
     updatePhoto: '/api/photos/:id',
     getFavoritePhotos: '/api/photos/favorites',
+    // Album
     createAlbum: '/api/albums/',
     getAlbums: '/api/albums/',
     getAlbum: '/api/albums/:id',
     deleteAlbum: '/api/albums',
     updateAlbum: '/api/albums/:id',
+    // Order
     createOrder: '/api/orders/',
     getOrders: '/api/orders/',
-    getOrder: '/api/orders/:id',
+    getOrderById: '/api/orders/:id',
     updateOrder: '/api/orders/:id',
     deleteOrder: '/api/orders',
+    // User
     createUser: '/api/users/',
     getUsers: '/api/users/',
     getUserByEmail: '/api/users?email=:email',

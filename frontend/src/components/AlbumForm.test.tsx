@@ -17,10 +17,12 @@ jest.mock('../services/api', () => ({
     __esModule: true,
     default: {
         apiPost: jest.fn(),
+        apiPut: jest.fn(),
     },
 }));
 
 const mockedApiPost = api.apiPost as jest.MockedFunction<typeof api.apiPost>;
+const mockedApiPut = api.apiPut as jest.MockedFunction<typeof api.apiPut>;
 
 describe('AlbumForm Component', () => {
     beforeEach(() => {
@@ -72,7 +74,7 @@ describe('AlbumForm Component', () => {
     });
 
     test('uses updateAlbum URL when action is not create', async () => {
-        mockedApiPost.mockResolvedValueOnce({ id: 2 });
+        mockedApiPut.mockResolvedValueOnce({ id: 2 });
 
         render(<AlbumForm action="update" />);
 
@@ -89,7 +91,7 @@ describe('AlbumForm Component', () => {
         fireEvent.submit(screen.getByRole('button', { name: 'Submit' }).closest('form')!);
 
         await waitFor(() => {
-            expect(mockedApiPost).toHaveBeenCalledWith(ApiUrls.updateAlbum, {
+            expect(mockedApiPut).toHaveBeenCalledWith(ApiUrls.updateAlbum, {
                 name: 'Updated Album',
                 event: 'family',
                 author: 'Jane Doe',

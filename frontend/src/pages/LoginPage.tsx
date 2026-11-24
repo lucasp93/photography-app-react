@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, CheckCircle2, LogIn } from 'lucide-react';
-import { getUserByEmail } from '../services/utils';
 import { useAuth } from '../context/AuthContext';
 import Alert from '@mui/material/Alert';
 
@@ -38,29 +37,19 @@ export const LoginPage: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsSubmitting(true);
-        // TODO: add login logic, change isSubmitted state
-        const email = formData.email;
-        const password = formData.password;
-        let username = '';
+        setErrorMessage(null);
 
-        const userData = await getUserByEmail(email);
-        if (!userData) {
-            throw new Error('Authenticated user was not found');
-        }
-
-        username = userData[0].username;
-        // Perform login
         try {
-            const response = await login(username, password);
+            await login(formData.email.trim(), formData.password);
             setStatus('success');
             setIsSubmitted(true);
-            setIsSubmitting(false);
             navigate('/');
         } catch (err) {
             console.error('Failed to login:', err);
             setStatus('error');
+            setErrorMessage('Email/username or password is incorrect');
+        } finally {
             setIsSubmitting(false);
-            setErrorMessage('Username or password is incorrect');
         }
     }
 
@@ -92,10 +81,10 @@ export const LoginPage: React.FC = () => {
                                 <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
                                     {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
                                     <div className="flex flex-col gap-6">
-                                        {/* Email */}
+                                        {/* Email or Username */}
                                         <div>
                                             <label htmlFor="email" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
-                                                Email
+                                                Email or Username
                                             </label>
                                             <input
                                                 type="text"
@@ -104,7 +93,7 @@ export const LoginPage: React.FC = () => {
                                                 required
                                                 value={formData.email}
                                                 onChange={handleChange}
-                                                placeholder="Email"
+                                                placeholder="Email or Username"
                                                 className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
                                             />
                                         </div>

@@ -1,10 +1,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
 import type { Order } from '../interfaces/interfaces';
-import { Table, Button, Form, Card, Row, Col, Pagination } from 'react-bootstrap';
+import { Table, Button, Form, Card, Row, Col } from 'react-bootstrap';
 import api from '../services/api';
-import { createOrder, deleteItem } from '../services/utils';
+import { deleteOrder } from '../services/orderService';
 import { PhotoListModal } from '../components/PhotoListModal';
+import { PaginationBar } from '../components/PaginationBar';
+import Alert from '@mui/material/Alert';
 
 export const OrderListPage: React.FC = () => {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -40,50 +42,10 @@ export const OrderListPage: React.FC = () => {
             setError('Failed to fetch items: ' + err);
         }
     }, []);
-    // Form Input State
-    // const [newItemOrderNumber, setNewItemOrderNumber] = useState<string>('');
-    // const [newItemClientName, setNewItemClientName] = useState<string>('');
-    // const [newItemClientContact, setNewItemClientContact] = useState<string>('');
-    // const [newItemClientEmail, setNewItemClientEmail] = useState<string>('');
-    // const [newItemPrice, setNewItemPrice] = useState<number>(0);
-    //const [newItemPhotos, setNewItemPhotos] = useState<string>('');
-
-    // Add Item Handler
-    // const handleAddItem = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     if (!newItemClientName.trim() || !newItemOrderNumber.trim()) return;
-
-    //     const newItem: Order = {
-    //         id: Date.now(),
-    //         order_number: newItemOrderNumber,
-    //         client_name: newItemClientName,
-    //         client_contact: newItemClientContact,
-    //         client_email: newItemClientEmail,
-    //         price: newItemPrice,
-    //         photos: [],
-    //     };
-
-    //     // Create new album
-    //     const response = await createOrder(newItem);
-    //     if (response) {
-    //         setStatus('success');
-    //         setItems((prev) => [...prev, newItem]);
-    //     } else {
-    //         setStatus('error');
-    //     }
-
-    //     // Reset Form Fields
-    //     setNewItemOrderNumber('');
-    //     setNewItemClientName('');
-    //     setNewItemClientContact('');
-    //     setNewItemClientEmail('');
-    //     setNewItemPrice(0);
-    // };
 
     // Delete Item Handler
     const handleDeleteItem = async (id: number) => {
-        const url = id ? ApiUrls.deleteOrder ? ApiUrls.deleteOrder.replace(':id', id.toString()) : '' : '';
-        const response = await deleteItem(url, id);
+        const response = await deleteOrder(id);
 
         if (response) {
             setStatus('success');
@@ -129,88 +91,13 @@ export const OrderListPage: React.FC = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
     const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setItemsPerPage(Number(e.target.value));
         setCurrentPage(1); // Reset to page 1 on limit change
     };
 
-    // Helper function to generate pagination items with ellipsis (...)
-    const renderPaginationItems = () => {
-        const pageItems = [];
-        const maxVisiblePages = 5; // Number of page buttons shown around active page
-
-        if (totalPages <= maxVisiblePages + 2) {
-            // Show all pages if total pages are small
-            for (let i = 1; i <= totalPages; i++) {
-                pageItems.push(
-                    <Pagination.Item
-                        key={i}
-                        active={i === currentPage}
-                        onClick={() => handlePageChange(i)}
-                    >
-                        {i}
-                    </Pagination.Item>
-                );
-            }
-        } else {
-            // Always show first page
-            pageItems.push(
-                <Pagination.Item
-                    key={1}
-                    active={1 === currentPage}
-                    onClick={() => handlePageChange(1)}
-                >
-                    1
-                </Pagination.Item>
-            );
-
-            let startPage = Math.max(2, currentPage - 1);
-            let endPage = Math.min(totalPages - 1, currentPage + 1);
-
-            // Left ellipsis
-            if (startPage > 2) {
-                pageItems.push(<Pagination.Ellipsis key="left-ellipsis" disabled />);
-            }
-
-            // Middle pages around active page
-            for (let i = startPage; i <= endPage; i++) {
-                pageItems.push(
-                    <Pagination.Item
-                        key={i}
-                        active={i === currentPage}
-                        onClick={() => handlePageChange(i)}
-                    >
-                        {i}
-                    </Pagination.Item>
-                );
-            }
-
-            // Right ellipsis
-            if (endPage < totalPages - 1) {
-                pageItems.push(<Pagination.Ellipsis key="right-ellipsis" disabled />);
-            }
-
-            // Always show last page
-            pageItems.push(
-                <Pagination.Item
-                    key={totalPages}
-                    active={totalPages === currentPage}
-                    onClick={() => handlePageChange(totalPages)}
-                >
-                    {totalPages}
-                </Pagination.Item>
-            );
-        }
-
-        return pageItems;
-    };
-
     if (status === 'loading') return <p>Loading items...</p>;
-    if (status === 'error') return <p>Error: {error}</p>;
+    { error && <Alert severity="error">{error}</Alert> }
 
     return (
         <div className="container py-4">
@@ -351,34 +238,12 @@ export const OrderListPage: React.FC = () => {
                 {/* Card Footer with Ellipsis Pagination */}
                 {totalPages > 1 && (
                     <Card.Footer className="bg-white d-flex justify-content-between align-items-center py-3">
-                        <div className="text-muted small">
-                            Showing <strong>{indexOfFirstItem + 1}</strong> to{' '}
-                            <strong>{Math.min(indexOfLastItem, totalItems)}</strong> of{' '}
-                            <strong>{totalItems}</strong> entries
-                        </div>
-
-                        <Pagination className="mb-0">
-                            <Pagination.First
-                                onClick={() => handlePageChange(1)}
-                                disabled={currentPage === 1}
-                            />
-                            <Pagination.Prev
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                            />
-
-                            {/* Render ellipsis-bounded page items */}
-                            {renderPaginationItems()}
-
-                            <Pagination.Next
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                            />
-                            <Pagination.Last
-                                onClick={() => handlePageChange(totalPages)}
-                                disabled={currentPage === totalPages}
-                            />
-                        </Pagination>
+                        <PaginationBar
+                            totalItems={totalItems}
+                            itemsPerPage={itemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
                     </Card.Footer>
                 )}
             </Card>

@@ -10,6 +10,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import type { Photo } from '../interfaces/interfaces';
 import { Button } from 'react-bootstrap';
 import { useCart } from '../context/CartContext';
+import { photoSizesArray, PhotoPriceArray } from '../constants/app.constant';
 
 const style = {
     position: 'absolute',
@@ -42,31 +43,6 @@ export const PrintSizeModal: React.FC<{
     const { addItem, updateSize } = useCart();
     const handleOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false); };
-
-    const photoSizesArray = ['9x13', '10x15', '11x15', '13x13', '13x18', '13x19', '15x20', 'A4', '20x30', '25x25', '25x33', '25x38', '28x36', 'A3', '30x40', '30x45', '40x50', 'A2', '40x60', '50x60', '60x90']
-    const PhotoPriceArray = [
-        { 'size': '9x13', 'price': 10 },
-        { 'size': '10x15', 'price': 12 },
-        { 'size': '11x15', 'price': 14 },
-        { 'size': '13x13', 'price': 16 },
-        { 'size': '13x18', 'price': 18 },
-        { 'size': '13x19', 'price': 20 },
-        { 'size': '15x20', 'price': 22 },
-        { 'size': 'A4', 'price': 24 },
-        { 'size': '20x30', 'price': 26 },
-        { 'size': '25x25', 'price': 28 },
-        { 'size': '25x33', 'price': 30 },
-        { 'size': '25x38', 'price': 32 },
-        { 'size': '28x36', 'price': 34 },
-        { 'size': 'A3', 'price': 36 },
-        { 'size': '30x40', 'price': 38 },
-        { 'size': '30x45', 'price': 40 },
-        { 'size': '40x50', 'price': 42 },
-        { 'size': 'A2', 'price': 44 },
-        { 'size': '40x60', 'price': 46 },
-        { 'size': '50x60', 'price': 48 },
-        { 'size': '60x90', 'price': 50 },
-    ]
 
     const handleSizeChange = (
         _event: React.MouseEvent<HTMLElement>,

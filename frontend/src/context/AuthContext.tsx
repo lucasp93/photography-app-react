@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import type { User } from '../interfaces/interfaces';
+import type { UserProfile } from '../interfaces/interfaces';
 import auth from '../services/auth';
 
 type AuthContextValue = {
-    user: User | null;
+    user: UserProfile | null;
     isAuthenticated: boolean;
     loading: boolean;
     login: (username: string, password: string) => Promise<void>;
@@ -14,7 +14,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {

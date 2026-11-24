@@ -6,7 +6,35 @@ import { ApiUrls } from '../utils/ApiUrls';
 import type { Album } from '../interfaces/interfaces';
 import Button from 'react-bootstrap/Button';
 
-export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
+export interface PhotoFormPayload {
+    name: string;
+    url: string;
+    author: string;
+    album: string | undefined;
+    featured: boolean;
+}
+
+export interface PhotoFormProps {
+    action: string;
+    fetchAlbum?: (albumId?: string) => Promise<Album>;
+    onSubmitPhoto?: (action: string, payload: PhotoFormPayload) => Promise<unknown>;
+}
+
+const defaultFetchAlbum = (albumId?: string): Promise<Album> => {
+    const url = albumId ? ApiUrls.getAlbum.replace(':id', albumId) : ApiUrls.getAlbum;
+    return api.apiGet<Album>(url);
+};
+
+const defaultSubmitPhoto = (action: string, payload: PhotoFormPayload): Promise<unknown> => {
+    const url = action === 'create' ? ApiUrls.createPhoto : ApiUrls.updatePhoto;
+    return action === 'create' ? api.apiPost(url, payload) : api.apiPut(url, payload);
+};
+
+export const PhotoForm: React.FC<PhotoFormProps> = ({
+    action,
+    fetchAlbum = defaultFetchAlbum,
+    onSubmitPhoto = defaultSubmitPhoto,
+}) => {
     const navigate = useNavigate();
     const { album_id: urlEvent } = useParams<{ album_id?: string }>();
     const [error, setError] = useState<string | null>(null);
@@ -15,9 +43,8 @@ export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const url = action === 'create' ? ApiUrls.createPhoto : ApiUrls.updatePhoto;
 
-        const payload = {
+        const payload: PhotoFormPayload = {
             name: String(formData.get('name') ?? ''),
             url: String(formData.get('url') ?? ''),
             author: String(formData.get('author') ?? ''),
@@ -26,7 +53,7 @@ export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
         };
 
         try {
-            const response = await api.apiPost(url, payload);
+            await onSubmitPhoto(action, payload);
             navigate(`/albums/${urlEvent}`);
         } catch (err) {
             console.error('Error creating album:', err);
@@ -36,14 +63,13 @@ export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
     };
 
     const fetchAlbumData = useCallback(async () => {
-        const url = urlEvent ? ApiUrls.getAlbum.replace(':id', urlEvent) : ApiUrls.getAlbum;
         try {
-            const data = await api.apiGet<Album>(url);
+            const data = await fetchAlbum(urlEvent);
             setAlbumTarget(data);
         } catch (err) {
             setError(`Failed to fetch album with ID: ${urlEvent}`);
         }
-    }, [urlEvent]);
+    }, [urlEvent, fetchAlbum]);
 
     useEffect(() => {
         fetchAlbumData();
@@ -57,11 +83,11 @@ export const PhotoForm: React.FC<{ action: string }> = ({ action }) => {
                 <Form.Group className="mb-3" controlId="formBasicEvent">
                     <Form.Label>Album</Form.Label>
                     <Form.Control
-                        type="text" 
-                        placeholder="Enter album" 
-                        name="album" 
-                        disabled 
-                        value={albumTarget?.name ?? ''} 
+                        type="text"
+                        placeholder="Enter album"
+                        name="album"
+                        disabled
+                        value={albumTarget?.name ?? ''}
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicName">

@@ -1,4 +1,6 @@
+from django.db.models import Q
 from rest_framework import serializers
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from ..users.models import User
 
 
@@ -25,3 +27,16 @@ class UserSerializer(serializers.ModelSerializer):
             user.set_password(password)
         user.save()
         return user
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Allow authentication using either username or email."""
+
+    def validate(self, attrs):
+        identifier = attrs.get(self.username_field, "").strip()
+        user = User.objects.filter(
+            Q(username=identifier) | Q(email__iexact=identifier)
+        ).first()
+        if user:
+            attrs[self.username_field] = user.username
+        return super().validate(attrs)

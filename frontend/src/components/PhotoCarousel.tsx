@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Paper, Typography } from '@mui/material';
 import type { Photo } from '../interfaces/interfaces';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -26,9 +27,14 @@ export const PhotoCarousel: React.FC<PhotoCarouselProps> = ({
     loopEnabled = true,
     className = "",
 }) => {
-    //const [currentIndex, setCurrentIndex] = useState(0);
-    //const [isPlaying, setIsPlaying] = useState<boolean>(autoPlay);
+    const navigate = useNavigate();
 
+    const handlePhotoClick = (photo: Photo) => {
+        const albumId = photo.album;
+        if (albumId) {
+            navigate(`/albums/${albumId}`);
+        }
+    };
 
     if (!photos || photos.length === 0) {
         return (
@@ -43,7 +49,7 @@ export const PhotoCarousel: React.FC<PhotoCarouselProps> = ({
             modules={[Navigation, Pagination, Autoplay]}
             spaceBetween={15}
             centeredSlides={false}
-            grabCursor={true}
+            grabCursor={false}
             navigation={arrowNav}
             keyboard={true}
             breakpoints={{
@@ -65,19 +71,35 @@ export const PhotoCarousel: React.FC<PhotoCarouselProps> = ({
             loop={loopEnabled}
             className="pb-5"
         >
-            {photos.map((photo) => (
-                <SwiperSlide key={photo.id}>
-                    <div className="flex flex-col items-center w-full h-100">
-                        <img
-                            src={photo.url}
-                            alt={photo.name}
-                            className="w-full h-80 object-cover rounded-lg"
-                        />
-                        <span className="mt-2 font-bold">{photo.name}</span>
-                        <p className="text-sm text-gray-500">{photo.author}</p>
-                    </div>
-                </SwiperSlide>
-            ))}
+            {photos.map((photo) => {
+                const albumId = photo.album_id ?? photo.album?.id;
+                return (
+                    <SwiperSlide key={photo.id}>
+                        <div
+                            role={albumId ? 'button' : undefined}
+                            tabIndex={albumId ? 0 : undefined}
+                            onClick={() => handlePhotoClick(photo)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handlePhotoClick(photo);
+                                }
+                            }}
+                            className={`flex flex-col items-center w-full h-100 ${albumId ? 'cursor-pointer hover:opacity-90 transition' : ''
+                                }`}
+                        >
+                            <img
+                                key={photo.id}
+                                src={photo.url}
+                                alt={photo.name}
+                                className="w-full h-80 object-cover rounded-lg"
+                            />
+                            <span className="mt-2 font-bold">{photo.name}</span>
+                            <p className="text-sm text-gray-500">{photo.author}</p>
+                        </div>
+                    </SwiperSlide>
+                );
+            })}
         </Swiper>
     );
 };

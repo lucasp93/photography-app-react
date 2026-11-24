@@ -5,23 +5,40 @@ import Form from 'react-bootstrap/Form';
 import api from '../services/api';
 import { ApiUrls } from '../utils/ApiUrls';
 
-export const AlbumForm: React.FC<{ action: string }> = ({ action }) => {
+export interface AlbumFormPayload {
+    name: string;
+    event: string;
+    author: string;
+}
+
+export interface AlbumFormProps {
+    action: string;
+    onSubmitAlbum?: (action: string, payload: AlbumFormPayload) => Promise<unknown>;
+}
+
+const defaultSubmitAlbum = (action: string, payload: AlbumFormPayload): Promise<unknown> => {
+    const url = action === 'create' ? ApiUrls.createAlbum : ApiUrls.updateAlbum;
+    return action === 'create' ? api.apiPost(url, payload) : api.apiPut(url, payload);
+};
+
+export const AlbumForm: React.FC<AlbumFormProps> = ({
+    action,
+    onSubmitAlbum = defaultSubmitAlbum,
+}) => {
     const navigate = useNavigate();
     const { event: urlEvent } = useParams<{ event?: string }>();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
-        const payload = {
+        const payload: AlbumFormPayload = {
             name: String(formData.get('name') ?? ''),
             event: String(formData.get('event') ?? ''),
             author: String(formData.get('author') ?? ''),
         };
 
-        const url = action === 'create' ? ApiUrls.createAlbum : ApiUrls.updateAlbum;
-
         try {
-            const response = await api.apiPost(url, payload);
+            await onSubmitAlbum(action, payload);
             const eventValue = payload.event;
             navigate(`/portfolio/${eventValue}`);
         } catch (error) {

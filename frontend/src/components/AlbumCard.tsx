@@ -4,28 +4,34 @@ import type { Album, Photo } from '../interfaces/interfaces';
 import Card from 'react-bootstrap/Card';
 import IconButton from '@mui/material/IconButton';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-// import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { ApiUrls } from '../utils/ApiUrls';
 import api from '../services/api';
+import Alert from '@mui/material/Alert';
 
 export interface AlbumCardProps {
     album: Album | null;
     showLinks?: boolean;
+    fetchFeaturedPhotos?: (albumId?: string | number) => Promise<Photo[]>;
 }
+
+const defaultFetchFeaturedPhotos = (albumId?: string | number): Promise<Photo[]> => {
+    const url = albumId ? `${ApiUrls.getPhotos}?album_id=${albumId}&featured=true` : ApiUrls.getPhotos;
+    return api.apiGet<Photo[]>(url);
+};
 
 export const AlbumCard: React.FC<AlbumCardProps> = ({
     album = null,
-    showLinks = true
+    showLinks = true,
+    fetchFeaturedPhotos: fetchPhotosFn = defaultFetchFeaturedPhotos,
 }) => {
     const [featured, setFeatured] = useState<Photo[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const fetchFeaturedPhotos = useCallback(async () => {
-        const url = album ? `${ApiUrls.getPhotos}?album_id=${album.id}&featured=true` : ApiUrls.getPhotos;
         try {
-            const data = await api.apiGet<Photo[]>(url);
+            const data = await fetchPhotosFn(album?.id);
             setFeatured(data);
         } catch (err) {
             console.error(`Failed to fetch photos for album ${album?.id}`, err);
@@ -38,7 +44,7 @@ export const AlbumCard: React.FC<AlbumCardProps> = ({
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [album?.id, fetchPhotosFn]);
 
     const handleAlbumClick = () => {
         navigate(`/albums/${album?.id}/`);
@@ -49,7 +55,7 @@ export const AlbumCard: React.FC<AlbumCardProps> = ({
     }, [fetchFeaturedPhotos]);
 
     if (loading) return <p>Loading items...</p>
-    if (error) return <p>Error: {error}</p>
+    { error && <Alert severity="error">{error}</Alert> }
     return (
         <Card border="secondary" bg="light" className="w-full max-w-72 hover:shadow-lg transition-shadow cursor-pointer" onClick={handleAlbumClick}>
             <Card.Img variant="top" src={featured[0]?.url || 'https://picsum.photos/id/237/1200/800.jpg'} />

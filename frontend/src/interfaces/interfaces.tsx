@@ -1,16 +1,35 @@
 // Database interfaces
-export interface Photo {
+export interface Album {
+    id: string | number;
+    name: string;
+    event: string;
+    author: string;
+}
+
+export interface PhotoSummary {
     id: string | number;
     name: string;
     author: string;
+    url: string;
+    size?: string;
+    album_name?: string;
+    album_author?: string;
+}
+
+export interface PhotoCreateInput {
+    name: string;
+    author: string;
     featured: boolean;
-    is_favorited: boolean;
-    album: Album | null;
     url: string;
     album_id: string | number;
-    album_name: string;
-    album_author: string;
-    size: string; // New field for photo size
+    size?: string;
+}
+
+export interface Photo extends PhotoSummary {
+    featured: boolean;
+    is_favorited?: boolean;
+    album?: Album | null;
+    album_id?: string | number;
 }
 
 export interface Order {
@@ -23,28 +42,29 @@ export interface Order {
     photos: Photo[];
 }
 
-export interface Album {
-    id: string | number;
-    name: string;
-    event: string;
-    author: string;
-}
-
-export interface User {
+export interface UserProfile {
     id: string | number;
     username: string;
-    password: string
     email: string;
     first_name: string;
     last_name: string;
-    last_login: string;
     role: string;
+    last_login?: string;
 }
 
-//others
+export interface UserCreateInput extends Omit<UserProfile, 'id' | 'last_login'> {
+    id?: string | number;
+    password: string;
+    last_login?: string;
+}
+
+export interface User extends UserProfile {
+    password?: string;
+}
+
+// Others
 export interface AppFooterProps {
     name: string;
-    year: number;
 }
 
 export interface EmailProps {

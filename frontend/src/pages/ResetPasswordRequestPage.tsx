@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Mail } from 'lucide-react';
-import { getUserByEmail } from '../services/utils';
+import { getUserByEmail } from '../services/userService';
 
 export const ResetPasswordRequestPage = () => {
     const [email, setEmail] = useState('');
@@ -17,14 +17,6 @@ export const ResetPasswordRequestPage = () => {
         // validate email
         if (!email.includes('@')) {
             setErrorMessage('Please enter a valid email address.');
-            setIsSubmitting(false);
-            return;
-        }
-
-        // check if email exists
-        const userData = await getUserByEmail(email);
-        if (!userData || userData.length === 0) {
-            setErrorMessage('No user found with that email address.');
             setIsSubmitting(false);
             return;
         }

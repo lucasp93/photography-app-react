@@ -7,10 +7,10 @@ import { PhotoCard } from '../components/PhotoCard';
 import api from '../services/api';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Alert from 'react-bootstrap/Alert';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import { useAuth } from '../context/AuthContext';
-import { getUserFavoritePhotos } from '../services/utils';
+import { getUserFavoritePhotos } from '../services/photoService';
 
 export const AlbumPhotosPage: React.FC = () => {
     const { album_id } = useParams<{ album_id: string }>();
@@ -57,7 +57,7 @@ export const AlbumPhotosPage: React.FC = () => {
     }
 
     const fetchFavoritePhotos = useCallback(async () => {
-        const favorite_photos = await getUserFavoritePhotos(Number(user?.id));
+        const favorite_photos = await getUserFavoritePhotos();
         if (favorite_photos && favorite_photos?.length > 0) {
             const favoritePhotoIds = favorite_photos.map(photo => Number(photo.id)); // Map photo IDs
             setFavoritePhotos(favoritePhotoIds); // Set favorite photo IDs
@@ -87,7 +87,7 @@ export const AlbumPhotosPage: React.FC = () => {
     }, [fetchPhotos, fetchAlbum, fetchFavoritePhotos]);
 
     if (loading) return <p>Loading photos...</p>
-    if (error) return <p>Error: {error}</p>
+    { error && <Alert severity="error">{error}</Alert> }
     return (
         <div className="flex-1 flex flex-col">
             {/* <h4 className="mt-2 font-serif text-4l font-cursice text-center bg-transparent">{event_name?.toUpperCase()}</h4> */}
@@ -111,7 +111,7 @@ export const AlbumPhotosPage: React.FC = () => {
                             </Col>
                         ))}
                     </Row> :
-                    <Alert variant="light">
+                    <Alert severity="info">
                         <p>No photos found</p>
                     </Alert>}
             </div>

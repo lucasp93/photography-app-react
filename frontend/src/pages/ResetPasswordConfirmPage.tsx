@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { User, CheckCircle2, LogIn } from 'lucide-react';
-import { getUserById } from '../services/utils';
-import api from '../services/api';
-import { ApiUrls } from '../utils/ApiUrls';
-
 export interface ResetPasswordFormData {
     password: string;
     confirmPassword: string;
@@ -33,14 +29,6 @@ export const ResetPasswordConfirmPage: React.FC = () => {
         e.preventDefault();
         setErrorMessage('');
         setIsSubmitting(true);
-        // TODO: Implement logic to send forgot password email
-        //const password = formData.password;
-        //const confirmPassword = formData.confirmPassword;
-
-        //let userData = await getUserById(uid.toString());
-        // if (!userData) {
-        //     throw new Error('User was not found.');
-        // }
 
         if (password !== confirmPassword) {
             setErrorMessage('Passwords do not match.');
@@ -48,9 +36,6 @@ export const ResetPasswordConfirmPage: React.FC = () => {
             return;
         }
         try {
-            // const url = ApiUrls.updateUser.replace(':id', userId.toString());
-            // userData[0].password = password;
-            // //const response = await api.apiPut(url, userData);
             const response = await fetch('/api/password/reset/confirm/', {
                 method: 'POST',
                 headers: {
@@ -65,12 +50,12 @@ export const ResetPasswordConfirmPage: React.FC = () => {
             const data = await response.json();
             // Handle validation errors from backend
             if (!response.ok) {
-                const error_data = 
+                const error_data =
                     data.detail ||
                     (Array.isArray(data.new_password) ? data.new_password[0] : data.new_password) ||
                     'Failed to reset password.';
                 throw new Error(
-                    error_data  || 'Failed to update password.');
+                    error_data || 'Failed to update password.');
             }
             // Handle success
             setStatus('success');
@@ -86,16 +71,6 @@ export const ResetPasswordConfirmPage: React.FC = () => {
         }
     }
 
-    // const handleChange = (
-    //     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-    // ) => {
-    //     const { name, value } = e.target;
-    //     setFormData((prev) => ({
-    //         ...prev,
-    //         [name]: value,
-    //     }));
-    // };
-
     return (
         <div className="flex-1 flex flex-col">
             <div className="flex-1 bg-gray-100 text-neutral-800 py-8 px-4 sm:px-6 lg:px-8 font-sans">
@@ -106,9 +81,6 @@ export const ResetPasswordConfirmPage: React.FC = () => {
                         <div className="flex justify-center mb-4">
                             <User className="w-10 h-10 text-neutral-400" />
                         </div>
-                        {/* <h1 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
-                            Login
-                        </h1> */}
                     </div>
 
                     <div className="w-full max-w-lg mx-auto">
@@ -121,7 +93,7 @@ export const ResetPasswordConfirmPage: React.FC = () => {
                                 </div>
                             ) : (
                                 <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="flex flex-col gap-6">
                                         {/* Password */}
                                         <div>
                                             <label htmlFor="password" className="block text-xs uppercase tracking-widest text-neutral-600 mb-2">
@@ -132,9 +104,8 @@ export const ResetPasswordConfirmPage: React.FC = () => {
                                                 id="password"
                                                 name="password"
                                                 required
-                                                value={password} //{formData.password}
+                                                value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
-                                                //onChange={handleChange}
                                                 placeholder="Password"
                                                 className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
                                             />
@@ -149,8 +120,8 @@ export const ResetPasswordConfirmPage: React.FC = () => {
                                                 id="confirmPassword"
                                                 name="confirmPassword"
                                                 required
-                                                value={confirmPassword}//{formData.confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)} //{handleChange}
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
                                                 placeholder="Password"
                                                 className="w-full bg-neutral-100 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-neutral-500 placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition"
                                             />
