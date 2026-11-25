@@ -10,7 +10,6 @@ async function refreshAccessToken(): Promise<boolean> {
 
   try {
     await auth.refreshToken();
-    //return getAccessToken();
     return true;
   } catch (err) {
     console.error('Failed to refresh token: ', err);

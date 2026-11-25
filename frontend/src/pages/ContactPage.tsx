@@ -42,9 +42,6 @@ export const ContactPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate API call (e.g., sending email via backend or service like EmailJS)
-    //await new Promise((resolve) => setTimeout(resolve, 1500));
     setStatus('loading');
     const emailContent = {
       name: formData.fullName,
@@ -94,7 +91,6 @@ export const ContactPage: React.FC = () => {
                 <div className="flex items-start space-x-4">
                   <Mail className="w-5 h-5 text-neutral-400 mt-1" />
                   <div>
-                    {/* <p className="text-xs uppercase tracking-widest text-neutral-500">Email</p> */}
                     <a href="mailto:hello@test.com" className="text-sm text-neutral-300 hover:text-neutral-500 transition">
                       hello@test.com
                     </a>
@@ -104,7 +100,6 @@ export const ContactPage: React.FC = () => {
                 <div className="flex items-start space-x-4">
                   <Phone className="w-5 h-5 text-neutral-400 mt-1" />
                   <div>
-                    {/* <p className="text-xs uppercase tracking-widest text-neutral-500">Phone</p> */}
                     <a href="tel:+1234567890" className="text-sm text-neutral-300 hover:text-neutral-300 transition">
                       +1 (555) 234-5678
                     </a>

@@ -12,7 +12,6 @@ import { useCart } from '../context/CartContext';
 import { FinishOrderModal } from '../components/FinishOrderModal';
 
 export const CheckoutPage: React.FC = () => {
-    // const [counter, setCounter] = useState<number>(1);
     const { items, totalPrice } = useCart();
 
     return (

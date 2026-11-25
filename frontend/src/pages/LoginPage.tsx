@@ -64,9 +64,6 @@ export const LoginPage: React.FC = () => {
                         <div className="flex justify-center mb-2">
                             <User className="w-10 h-10 text-neutral-400" />
                         </div>
-                        {/* <h1 className="text-4xl md:text-5xl font-light tracking-wide uppercase">
-                            Login
-                        </h1> */}
                     </div>
 
                     <div className="w-full max-w-lg mx-auto">

@@ -9,10 +9,8 @@ export const ExperiencePage: React.FC = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-4 px-4 w-full max-w-7xl">
                 <Card border="secondary">
-                    {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
                     <Card.Header>The journey from start to gallery</Card.Header>
                     <Card.Body>
-                        {/* <Card.Title></Card.Title> */}
                         <ListGroup>
                             <ListGroup.Item>
                                 <p><b>Consultation & Vision</b></p>
@@ -27,18 +25,11 @@ export const ExperiencePage: React.FC = () => {
                                 <p>You’ll receive a polished sneak peek gallery within 48 hours. Your full, high-resolution collection follows in an interactive digital gallery complete with print-ordering options.</p>
                             </ListGroup.Item>
                         </ListGroup>
-                        {/* <Card.Text>
-                        </Card.Text> */}
                     </Card.Body>
-                    {/* <Card.Footer>
-                        <small className="text-muted">Last updated 3 mins ago</small>
-                    </Card.Footer> */}
                 </Card>
                 <Card border="secondary">
-                    {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
                     <Card.Header>What Working Together Feels Like</Card.Header>
                     <Card.Body>
-                        {/* <Card.Title></Card.Title> */}
                         <ListGroup>
                             <ListGroup.Item>
                                 <p><b>Planning Your Story</b></p>
@@ -53,18 +44,11 @@ export const ExperiencePage: React.FC = () => {
                                 <p>Within three weeks, your personal online gallery opens. From there, you can download high-res files, share with family, or order archival prints directly to your door.</p>
                             </ListGroup.Item>
                         </ListGroup>
-                        {/* <Card.Text>
-                        </Card.Text> */}
                     </Card.Body>
-                    {/* <Card.Footer>
-                        <small className="text-muted">Last updated 3 mins ago</small>
-                    </Card.Footer> */}
                 </Card>
                 <Card border="secondary">
-                    {/* <Card.Img variant="top" src="holder.js/100px160" /> */}
                     <Card.Header>Our Production Process</Card.Header>
                     <Card.Body>
-                        {/* <Card.Title></Card.Title> */}
                         <ListGroup>
                             <ListGroup.Item>
                                 <p><b>Strategy & Shot Lists</b></p>
@@ -79,12 +63,7 @@ export const ExperiencePage: React.FC = () => {
                                 <p>Color grading, skin retouching, and asset sizing delivered via secure cloud download with full commercial licensing documentation.</p>
                             </ListGroup.Item>
                         </ListGroup>
-                        {/* <Card.Text>
-                        </Card.Text> */}
                     </Card.Body>
-                    {/* <Card.Footer>
-                        <small className="text-muted">Last updated 3 mins ago</small>
-                    </Card.Footer> */}
                 </Card>
             </div>
         </div>

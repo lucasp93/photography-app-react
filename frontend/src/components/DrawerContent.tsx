@@ -28,18 +28,6 @@ export const DrawerContent: React.FC = () => {
 
     const DrawerItems = (
         <Box sx={{ width: 400, maxWidth: '100%', display: 'flex', flexDirection: 'column', height: '100%' }} role="presentation">
-            {/* <List>
-                {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-                    <ListItem key={text} disablePadding>
-                        <ListItemButton>
-                            <ListItemIcon>
-                                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                            </ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItemButton>
-                    </ListItem>
-                ))}
-            </List> */}
             <title>Shopping Bag</title>
             <List
                 sx={{

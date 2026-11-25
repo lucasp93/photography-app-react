@@ -31,11 +31,10 @@ function AppRoutes() {
             <Route path='/password/reset' element={<ResetPasswordRequestPage />} />
             <Route path='/login' element={<LoginPage />} />
             <Route path='/signup' element={<SignUpPage />} />
-            <Route path='/checkout/cart' element={<CheckoutPage />} />      
+            <Route path='/checkout/cart' element={<CheckoutPage />} />
             {/* Protected Routes Group */}
             {/* Unauthenticated users attempting to access any child route will be redirected to "/" */}
             <Route element={<ProtectedRoute redirectTo="/" />}>
-                {/* <Route path='/checkout/cart' element={<CheckoutPage />} /> */}
                 <Route path='/albums' element={<AlbumListPage />} />
                 <Route path='/photos' element={<PhotoListPage />} />
                 <Route path='/users' element={<UserListPage />} />
@@ -44,17 +43,7 @@ function AppRoutes() {
                 <Route path='/albums/edit/:id' element={<FormPage target={"album"} action={"update"} />} />
                 <Route path="/photos/create/:album_id" element={<FormPage target={"photo"} action={"create"} />} />
                 <Route path='/favourites' element={<FavouritesPage />} />
-                {/* <Route path='/photos' element={<PhotoListPage target={"photo"} />} />
-                <Route path='/orders' element={<OrderListPage target={"order"} />} />
-                <Route path='/users' element={<UserListPage target={"user"} /> } /> */}
             </Route>
-           {/* 
-            <Route path='/albums/edit/:id' element={<AlbumEdit />} />
-            <Route path='/users' element={<UserPage />} />
-            <Route path='/users/edit/:id' element={<UserEdit />} />
-            <Route path='/photos/edit/:id' element={<PhotoEdit />} />
-             
-            */}
         </Routes>
     )
 }

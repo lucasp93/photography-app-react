@@ -84,15 +84,12 @@ export const PhotoForm: React.FC<PhotoFormProps> = ({
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicName">
-                    {/* <Form.Label>Name</Form.Label> */}
                     <Form.Control type="text" placeholder="Enter name" name="name" required />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicEvent">
-                    {/* <Form.Label>Author</Form.Label> */}
                     <Form.Control type="text" placeholder="Enter author" name="author" required />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicEvent">
-                    {/* <Form.Label>Url</Form.Label> */}
                     <Form.Control type="text" placeholder="Enter url" name="url" required />
                 </Form.Group>
                 <Form.Group className="mb-3 flex flex-row justify-start" controlId="formBasicEvent">

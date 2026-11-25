@@ -88,7 +88,6 @@ export const PrintSizeModal: React.FC<{
                                 <CardMedia
                                     component="img"
                                     className="w-full h-full object-cover rounded"
-                                    //sx={{ width: 90, height: 90, objectFit: 'cover' }}
                                     image={photo.url}
                                     alt={photo.name}
                                 />
@@ -98,7 +97,6 @@ export const PrintSizeModal: React.FC<{
                                 <Typography variant="body2" className="text-neutral-500">
                                     {photo.album_name}
                                 </Typography>
-                                {/* <Typography variant="subtitle1">Select photo size</Typography> */}
                                 <Stack direction="row" spacing={4} className="block mt-2">
                                     <ToggleButtonGroup
                                         orientation="horizontal"

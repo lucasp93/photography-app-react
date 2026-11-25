@@ -16,7 +16,6 @@ export const MainFooter: React.FC<AppFooterProps> = ({ name }) => {
                 <IconButton size="medium" color="inherit" href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><LinkedInIcon /></IconButton>
             </Stack>
             <div className="flex items-center space-x-4">
-                {/* <img src="/logo.png" alt="Logo" className="h-10" /> */}
                 <span className="font-semibold text-sm sm:text-base text-center">©{currentYear} {name} | All Rights Reserved</span>
             </div>
         </footer>

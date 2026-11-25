@@ -16,14 +16,8 @@ export const ResetPasswordConfirmPage: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState<string>('');
     const { uid, token } = useParams<{ uid: string; token: string }>();
 
-    //const userId = useParams<{ id: string }>();
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const navigate = useNavigate();
-
-    const [formData, setFormData] = useState<ResetPasswordFormData>({
-        password: '',
-        confirmPassword: '',
-    });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

@@ -8,7 +8,6 @@ import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Box from '@mui/material/Box';
-// import { isLoggedIn, clearTokens } from '../services/auth';
 import { useAuth } from '../context/AuthContext';
 import { DrawerContent } from './DrawerContent';
 
@@ -20,7 +19,6 @@ export const UserDropdownComponent: React.FC = () => {
     const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorElUser(event.currentTarget);
 
     const navigate = useNavigate();
-    //const [ user, isAuthenticated ] = useAuth();
     const { logout, isAuthenticated, user } = useAuth();
     const handleCloseUserMenu = () => setAnchorElUser(null);
 
