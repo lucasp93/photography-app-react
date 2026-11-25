@@ -5,14 +5,7 @@ import api from '../services/api';
 import { ApiUrls } from '../utils/ApiUrls';
 import type { Album } from '../interfaces/interfaces';
 import Button from 'react-bootstrap/Button';
-
-export interface PhotoFormPayload {
-    name: string;
-    url: string;
-    author: string;
-    album: string | undefined;
-    featured: boolean;
-}
+import type { PhotoFormPayload } from '../interfaces/interfaces';
 
 export interface PhotoFormProps {
     action: string;

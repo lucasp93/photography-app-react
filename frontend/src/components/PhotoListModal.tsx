@@ -41,17 +41,14 @@ export const PhotoListModal: React.FC<{
     const handleOpen = () => { setOpen(true) };
     const handleClose = () => { setOpen(false) };
 
-    console.log('photos: ', photos);
-
     return (
         <div>
             {trigger ? (
                 <span onClick={handleOpen}>{trigger}</span>
             ) : (
-                <Button onClick={handleOpen} className="mb-2">
+                <Button onClick={handleOpen} size="sm">
                     <ImageIcon />
                 </Button>
-                // <Link href="#" color="inherit" className="text-bold" onClick={handleOpen}>Print {size}</Link>
             )}
             <div>
                 <Modal
@@ -70,7 +67,7 @@ export const PhotoListModal: React.FC<{
                                         'Photo'
                                     }
                                 </Typography>
-                                <Divider orientation="horizontal" className="border-solid border-neutral-600" />
+                                <Divider orientation="horizontal" className="bg-neutral-500 mx-auto w-40" />
                                 {photos.length > 0 ?
                                     photos.map((photo, index) => (
                                         <ListItem

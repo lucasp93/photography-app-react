@@ -1,8 +1,8 @@
-import type { Photo } from '../interfaces/interfaces';
+import type { PhotoFormPayload, Photo } from '../interfaces/interfaces';
 import { ApiUrls } from '../utils/ApiUrls';
 import api from './api';
 
-export async function createPhoto(photoData: Photo): Promise<boolean> {
+export async function createPhoto(photoData: PhotoFormPayload): Promise<boolean> {
     const url = photoData ? ApiUrls.createPhoto : '';
     try {
         await api.apiPost(url, photoData);
@@ -24,9 +24,8 @@ export async function deletePhoto(photoId: number | string): Promise<boolean> {
     }
 }
 
-export async function updatePhoto(photoData: Photo): Promise<boolean> {
-    const url = photoData ? ApiUrls.updatePhoto : '';
-
+export async function updatePhoto(photoData: PhotoFormPayload, photoId: string | number): Promise<boolean> {
+    const url = photoId ? ApiUrls.updatePhoto.replace(':id', photoId.toString()) : '';
     try {
         await api.apiPut(url, photoData);
         return true;

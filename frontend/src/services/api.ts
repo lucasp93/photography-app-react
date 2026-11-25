@@ -135,6 +135,18 @@ export async function apiPut<T = any>(path: string, body: any): Promise<T> {
   return text ? (JSON.parse(text) as T) : (null as any);
 }
 
+export async function apiPatch<T = any>(path: string, body: any): Promise<T> {
+  const res = await authFetch(path, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+  const text = await res.text();
+  return text ? (JSON.parse(text) as T) : (null as any);
+}
+
 export async function apiDelete<T = any>(path: string, id: number): Promise<T> {
   const res = await authFetch(`${path}/${id}/`, {
     method: 'DELETE',
@@ -146,4 +158,4 @@ export async function apiDelete<T = any>(path: string, id: number): Promise<T> {
   return text ? (JSON.parse(text) as T) : (null as any);
 }
 
-export default { authFetch, apiGet, apiPost, apiPut, apiDelete };
+export default { authFetch, apiGet, apiPost, apiPut, apiPatch, apiDelete };

@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
 import type { Album } from '../interfaces/interfaces';
-import { Table, Button, Form, Card, Row, Col } from 'react-bootstrap';
+import { Table, Button, Form, Card, Row, Col, Spinner } from 'react-bootstrap';
 import api from '../services/api';
-import { createAlbum, deleteAlbum } from '../services/albumService';
+import { createAlbum, updateAlbum, deleteAlbum } from '../services/albumService';
 import { PaginationBar } from '../components/PaginationBar';
 import Alert from '@mui/material/Alert';
 
@@ -43,35 +43,62 @@ export const AlbumListPage: React.FC = () => {
     }, []);
 
     // Form Input State
+    const [action, setAction] = useState<'create' | 'update'>('create');
+    const [loading, setLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [newItemId, setNewItemId] = useState<number>(0);
     const [newItemName, setNewItemName] = useState<string>('');
     const [newItemAuthor, setNewItemAuthor] = useState<string>('');
     const [newItemEvent, setNewItemEvent] = useState<string>('');
 
-    // Add Item Handler
+    const handleClearAlbumForm = () => {
+        setNewItemId(0);
+        setNewItemName('');
+        setNewItemAuthor('');
+        setNewItemEvent('');
+    };
+
+    // Add / Update Item Handler
     const handleAddItem = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage(null);
         if (!newItemName.trim() || !newItemAuthor.trim()) return;
 
         const newItem: Album = {
-            id: Date.now(),
+            id: newItemId,
             name: newItemName,
             event: newItemEvent,
             author: newItemAuthor,
         };
 
-        // Create new album
-        const response = await createAlbum(newItem);
+        setLoading(true);
+        const response =
+            action === 'create' ? await createAlbum(newItem) : await updateAlbum(newItem);
+
         if (response) {
+            await fetchItems();
             setStatus('success');
-            setItems((prev) => [...prev, newItem]);
+            if (action !== 'create') {
+                setAction('create');
+            }
+            handleClearAlbumForm();
         } else {
             setStatus('error');
+            setErrorMessage(
+                action === 'create' ? 'Failed to create album' : 'Failed to update album'
+            );
         }
 
-        // Reset Form Fields
-        setNewItemName('');
-        setNewItemAuthor('');
-        setNewItemEvent('');
+        setLoading(false);
+    };
+
+    // Edit Item Handler
+    const handleEditItem = (item: Album) => {
+        setNewItemId(Number(item.id));
+        setNewItemName(item.name);
+        setNewItemEvent(item.event);
+        setNewItemAuthor(item.author);
+        setAction('update');
     };
 
     // Delete Item Handler
@@ -134,7 +161,10 @@ export const AlbumListPage: React.FC = () => {
         <div className="container py-4">
             <Card className="shadow-sm mb-4">
                 <Card.Body>
-                    <Card.Title className="mb-3">Add New Album</Card.Title>
+                    <Card.Title className="mb-3">
+                        {action === 'create' ? 'Add New Album' : 'Update Album'}
+                    </Card.Title>
+                    {errorMessage && <Alert severity="error" className="mb-3">{errorMessage}</Alert>}
                     {/* Add Item Form */}
                     <Form onSubmit={handleAddItem}>
                         <Row className="g-3 align-items-end">
@@ -155,7 +185,7 @@ export const AlbumListPage: React.FC = () => {
                                     <Form.Label>Event</Form.Label>
                                     <Form.Select
                                         name="event"
-                                        defaultValue={newItemEvent}
+                                        value={newItemEvent}
                                         onChange={(e) => setNewItemEvent(e.target.value)}
                                         required
                                     >
@@ -182,8 +212,15 @@ export const AlbumListPage: React.FC = () => {
                                 </Form.Group>
                             </Col>
                             <Col md={3}>
-                                <Button variant="primary" type="submit" className="w-100" onClick={handleAddItem}>
-                                    + Add Item
+                                <Button variant="primary" type="submit" className="w-100" disabled={loading}>
+                                    {loading ? (
+                                        <>
+                                            <Spinner animation="border" size="sm" className="me-2" />
+                                            {action === 'create' ? 'Saving...' : 'Updating...'}
+                                        </>
+                                    ) : (
+                                        action === 'create' ? 'Save' : 'Update'
+                                    )}
                                 </Button>
                             </Col>
                         </Row>
@@ -273,7 +310,7 @@ export const AlbumListPage: React.FC = () => {
                                 <th>Name</th>
                                 <th>Author</th>
                                 <th>Event</th>
-                                <th className="text-center" style={{ width: '120px' }}>
+                                <th className="text-center" style={{ width: '160px' }}>
                                     Actions
                                 </th>
                             </tr>
@@ -293,14 +330,24 @@ export const AlbumListPage: React.FC = () => {
                                         <td>{item.author}</td>
                                         <td>{item.event}</td>
                                         <td className="text-center">
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => handleDeleteItem(Number(item.id))}
-                                                title="Delete Item"
-                                            >
-                                                Delete
-                                            </Button>
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => handleEditItem(item)}
+                                                    title="Edit Item"
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteItem(Number(item.id))}
+                                                    title="Delete Item"
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

@@ -211,9 +211,9 @@ export const OrderListPage: React.FC = () => {
                                         <td>{item.client_email ?? '—'}</td>
                                         <td>{item.client_contact ?? '—'}</td>
                                         <td>{item.price ?? '—'}</td>
-                                        <td>
-                                            <Row className="align-items-center justify-content-center mt-2">
-                                                <Col md={6} className="mb-2">
+                                        <td className="align-items-center">
+                                            <Row className="align-items-center justify-content-center">
+                                                <Col>
                                                     <PhotoListModal photos={item.photos} />
                                                 </Col>
                                             </Row>

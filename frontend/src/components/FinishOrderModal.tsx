@@ -229,13 +229,6 @@ export const FinishOrderModal: React.FC<{
                                         )
                                         }
                                     </Button>
-                                    {/* <Link href="/login" sx={{ fontSize: '15px', color: 'grey', textDecoration: 'none', '&:hover': { color: 'lightgrey', textDecoration: 'none' } }}>
-                                Already have an account? Log in
-                            </Link> */}
-                                    {/* <Typography variant="body2">
-                                    {errorMessage && <p className="text-sm text-red-500">{errorMessage}</p>}
-                                    {successMessage && <p className="text-sm text-green-500">{successMessage}</p>}
-                                </Typography> */}
                                 </div>
                             </Form>
                         </Stack>

@@ -90,14 +90,12 @@ export const AlbumPhotosPage: React.FC = () => {
     { error && <Alert severity="error">{error}</Alert> }
     return (
         <div className="flex-1 flex flex-col">
-            {/* <h4 className="mt-2 font-serif text-4l font-cursice text-center bg-transparent">{event_name?.toUpperCase()}</h4> */}
             <div className="flex flex-col items-center justify-center flex-1 bg-gray-100 px-4 pt-5 pb-5">
-                {/* <CardGroup className="flex flex-wrap justify-center gap-4"> */}
+                <h4 className={`mb-4 font-serif text-3xl sm:text-4xl font-bold text-center bg-transparent ${isAuthenticated && user?.role === 'admin' ? 'mt-2' : ''}`}>{album?.name?.toUpperCase()}</h4>
                 {isAuthenticated && user?.role === 'admin' ?
-                    <Button variant="contained" className="self-end mb-2 mt-2" onClick={handleAddClick}>Add Photo</Button>
+                    <Button variant="contained" className="mx-auto mb-4" onClick={handleAddClick}>Add Photo</Button>
                     : null
                 }
-                <h4 className={`mb-4 font-serif text-3xl sm:text-4xl font-bold text-center bg-transparent ${isAuthenticated && user?.role === 'admin' ? 'mt-2' : ''}`}>{album?.name?.toUpperCase()}</h4>
                 {photos.length > 0 ?
                     <Row xs={1} sm={2} lg={3} xl={4} className="g-4 justify-content-center w-100">
                         {photos.map((photo) => (

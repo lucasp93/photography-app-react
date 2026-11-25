@@ -3,7 +3,6 @@ import type { Photo } from '../interfaces/interfaces';
 import Card from 'react-bootstrap/Card';
 import IconButton from '@mui/material/IconButton';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
-// import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { PrintSizeModal } from './PrintSizeModal';
@@ -68,16 +67,12 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
     }
   }
 
-  const handleCartIconClick = () => {
-    console.log('Cart icon clicked for photo ID:', photo?.id);
-  }
-
   useEffect(() => {
     setFavorited(isFavorited);
   }, [isFavorited]);
 
   return (
-    <Card border="info" style={{ width: '100%', maxWidth: '18rem' }}>
+    <Card className="w-full max-w-72 border border-[#1565c0]/40 shadow-sm shadow-[#0d47a1]/25 hover:shadow-lg hover:shadow-[#0d47a1]/40 transition-shadow">
       <Card.Img variant="top" src={photo?.url} />
       <Card.Body>
         <Card.Title>{photo?.name}</Card.Title>
@@ -112,8 +107,6 @@ export const PhotoCard: React.FC<PhotoCardProps> = ({
               }
             />
           ) : null}
-          {/* <Card.Link href="#">Card Link</Card.Link>
-        <Card.Link href="#">Another Link</Card.Link> */}
         </Card.Body> : null
       }
     </Card>

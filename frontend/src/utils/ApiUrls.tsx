@@ -5,19 +5,19 @@ export const ApiUrls = {
     getPhoto: '/api/photos/:id',
     getFeaturedPhotos: '/api/photos/featured',
     deletePhoto: '/api/photos',
-    updatePhoto: '/api/photos/:id',
+    updatePhoto: '/api/photos/:id/',
     getFavoritePhotos: '/api/photos/favorites',
     // Album
     createAlbum: '/api/albums/',
     getAlbums: '/api/albums/',
     getAlbum: '/api/albums/:id',
     deleteAlbum: '/api/albums',
-    updateAlbum: '/api/albums/:id',
+    updateAlbum: '/api/albums/:id/',
     // Order
     createOrder: '/api/orders/',
     getOrders: '/api/orders/',
     getOrderById: '/api/orders/:id',
-    updateOrder: '/api/orders/:id',
+    updateOrder: '/api/orders/:id/',
     deleteOrder: '/api/orders',
     // User
     createUser: '/api/users/',
@@ -25,6 +25,6 @@ export const ApiUrls = {
     getUserByEmail: '/api/users?email=:email',
     getUser: '/api/users/:id',
     deleteUser: '/api/users',
-    updateUser: '/api/users/:id',
+    updateUser: '/api/users/:id/',
     confirmPasswordReset: '/api/password/reset/confirm/',
 }

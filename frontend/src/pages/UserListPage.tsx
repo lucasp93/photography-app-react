@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
 import type { User } from '../interfaces/interfaces';
-import { Table, Button, Form, Card, Row, Col } from 'react-bootstrap';
+import { Table, Button, Form, Card, Row, Col, Spinner } from 'react-bootstrap';
 import api from '../services/api';
-import { createUser, deleteUser } from '../services/userService';
+import { createUser, updateUser, deleteUser } from '../services/userService';
 import { formatDate } from '../services/utils';
 import { PaginationBar } from '../components/PaginationBar';
 import Alert from '@mui/material/Alert';
@@ -46,47 +46,74 @@ export const UserListPage: React.FC = () => {
     }, []);
 
     // Form Input State
+    const [action, setAction] = useState<'create' | 'update'>('create');
+    const [loading, setLoading] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [newItemId, setNewItemId] = useState<number>(0);
     const [newItemUsername, setNewItemUsername] = useState<string>('');
     const [newItemEmail, setNewItemEmail] = useState<string>('');
     const [newItemFirstName, setNewItemFirstName] = useState<string>('');
     const [newItemLastName, setNewItemLastName] = useState<string>('');
     const [newItemRole, setNewItemRole] = useState<string>('user');
     const [newItemPassword, setNewItemPassword] = useState<string>('');
-    //const [newItemLastLogin, setNewItemLastLogin] = useState<string>('');
 
-    // Add Item Handler
+    const handleClearUserForm = () => {
+        setNewItemId(0);
+        setNewItemUsername('');
+        setNewItemEmail('');
+        setNewItemFirstName('');
+        setNewItemLastName('');
+        setNewItemRole('user');
+        setNewItemPassword('');
+    };
+
+    // Add / Update Item Handler
     const handleAddItem = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage(null);
         if (!newItemUsername.trim() || !newItemEmail.trim()) return;
-        const currentDate = new Date();
+
         const newItem: User = {
-            id: Date.now(),
+            id: newItemId,
             username: newItemUsername,
             password: newItemPassword,
             email: newItemEmail,
             first_name: newItemFirstName,
             last_name: newItemLastName,
-            last_login: currentDate.toISOString(),
-            role: newItemRole,
+            role: newItemRole || 'user',
         };
 
-        // Create new album
-        const response = await createUser(newItem);
+        setLoading(true);
+        const response =
+            action === 'create' ? await createUser(newItem) : await updateUser(newItem);
+
         if (response) {
+            await fetchItems();
             setStatus('success');
-            setItems((prev) => [...prev, newItem]);
+            if (action !== 'create') {
+                setAction('create');
+            }
+            handleClearUserForm();
         } else {
             setStatus('error');
+            setErrorMessage(
+                action === 'create' ? 'Failed to create user' : 'Failed to update user'
+            );
         }
 
-        // Reset Form Fields
-        setNewItemUsername('');
-        setNewItemEmail('');
-        setNewItemFirstName('');
-        setNewItemLastName('');
-        setNewItemRole('');
+        setLoading(false);
+    };
+
+    // Edit Item Handler
+    const handleEditItem = (item: User) => {
+        setNewItemId(Number(item.id));
+        setNewItemUsername(item.username);
+        setNewItemEmail(item.email);
+        setNewItemFirstName(item.first_name);
+        setNewItemLastName(item.last_name);
+        setNewItemRole(item.role || 'user');
         setNewItemPassword('');
-        //setNewItemLastLogin('');
+        setAction('update');
     };
 
     // Delete Item Handler
@@ -152,7 +179,10 @@ export const UserListPage: React.FC = () => {
         <div className="container py-4">
             <Card className="shadow-sm mb-4">
                 <Card.Body>
-                    <Card.Title className="mb-4">Add New User</Card.Title>
+                    <Card.Title className="mb-4">
+                        {action === 'create' ? 'Add New User' : 'Update User'}
+                    </Card.Title>
+                    {errorMessage && <Alert severity="error" className="mb-3">{errorMessage}</Alert>}
                     {/* Add Item Form */}
                     <Form onSubmit={handleAddItem}>
                         <Row className="g-3 align-items-end">
@@ -161,7 +191,7 @@ export const UserListPage: React.FC = () => {
                                     <Form.Label>Username</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        placeholder="e.g. John's Wedding"
+                                        placeholder="e.g. johndoe"
                                         value={newItemUsername}
                                         onChange={(e) => setNewItemUsername(e.target.value)}
                                         required
@@ -185,10 +215,10 @@ export const UserListPage: React.FC = () => {
                                     <Form.Label>Password</Form.Label>
                                     <Form.Control
                                         type="password"
-                                        placeholder="Password"
+                                        placeholder={action === 'create' ? 'Password' : 'Leave blank to keep current'}
                                         value={newItemPassword}
                                         onChange={(e) => setNewItemPassword(e.target.value)}
-                                        required
+                                        required={action === 'create'}
                                     />
                                 </Form.Group>
                             </Col>
@@ -216,25 +246,32 @@ export const UserListPage: React.FC = () => {
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={3}>
+                            <Col md={2}>
                                 <Form.Group controlId="itemRole">
                                     <Form.Label>Role</Form.Label>
                                     <Form.Select
                                         name="role"
-                                        defaultValue="user"
+                                        value={newItemRole}
                                         onChange={(e) => setNewItemRole(e.target.value)}
                                         required
                                     >
-                                        <option value="">Select Event</option>
+                                        <option value="">Select Role</option>
                                         <option value="admin">Admin</option>
                                         <option value="editor">Editor</option>
                                         <option value="user">User</option>
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-                            <Col md={3} className="align-center justify-center">
-                                <Button variant="primary" type="submit" className="w-100" onClick={handleAddItem}>
-                                    + Add Item
+                            <Col md={2} className="align-center justify-center">
+                                <Button variant="primary" type="submit" className="w-100" disabled={loading}>
+                                    {loading ? (
+                                        <>
+                                            <Spinner animation="border" size="sm" className="me-2" />
+                                            {action === 'create' ? 'Saving...' : 'Updating...'}
+                                        </>
+                                    ) : (
+                                        action === 'create' ? 'Save' : 'Update'
+                                    )}
                                 </Button>
                             </Col>
                         </Row>
@@ -340,7 +377,7 @@ export const UserListPage: React.FC = () => {
                                 <th>Last Name</th>
                                 <th>Role</th>
                                 <th>Last Login</th>
-                                <th className="text-center" style={{ width: '120px' }}>
+                                <th className="text-center" style={{ width: '160px' }}>
                                     Actions
                                 </th>
                             </tr>
@@ -363,14 +400,24 @@ export const UserListPage: React.FC = () => {
                                         <td>{item.role}</td>
                                         <td>{item.last_login ? formatDate(item.last_login) : '—'}</td>
                                         <td className="text-center">
-                                            <Button
-                                                variant="outline-danger"
-                                                size="sm"
-                                                onClick={() => handleDeleteItem(Number(item.id))}
-                                                title="Delete Item"
-                                            >
-                                                Delete
-                                            </Button>
+                                            <div className="d-flex justify-content-center gap-2">
+                                                <Button
+                                                    variant="outline-primary"
+                                                    size="sm"
+                                                    onClick={() => handleEditItem(item)}
+                                                    title="Edit Item"
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    size="sm"
+                                                    onClick={() => handleDeleteItem(Number(item.id))}
+                                                    title="Delete Item"
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

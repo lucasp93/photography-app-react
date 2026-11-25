@@ -24,6 +24,13 @@ export interface PhotoCreateInput {
     album_id: string | number;
     size?: string;
 }
+export interface PhotoFormPayload {
+    name: string;
+    url: string;
+    author: string;
+    album: string | undefined;
+    featured: boolean;
+}
 
 export interface Photo extends PhotoSummary {
     featured: boolean;

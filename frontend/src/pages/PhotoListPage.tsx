@@ -1,22 +1,29 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ApiUrls } from '../utils/ApiUrls';
-import type { Photo, Album } from '../interfaces/interfaces';
+import type { Photo, PhotoFormPayload, Album } from '../interfaces/interfaces';
 import { Table, Button, Form, Card, Row, Col } from 'react-bootstrap';
 import api from '../services/api';
-import { createPhoto, deletePhoto } from '../services/photoService';
+import { createPhoto, deletePhoto, updatePhoto } from '../services/photoService';
 import { PaginationBar } from '../components/PaginationBar';
+import Alert from '@mui/material/Alert';
+import Spinner from 'react-bootstrap/Spinner';
 
 export const PhotoListPage: React.FC = () => {
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-    const [error, setError] = useState<string | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [items, setItems] = useState<Photo[]>([]);
     const [albums, setAlbums] = useState<Album[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    // Action state
+    const [action, setAction] = useState<string>('create');
 
     // 1. Pagination State
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
     // 2. Form Input State
+    const [newItemId, setNewItemId] = useState<number>(0);
     const [newItemName, setNewItemName] = useState<string>('');
     const [newItemAuthor, setNewItemAuthor] = useState<string>('');
     const [newItemFeatured, setNewItemFeatured] = useState<boolean>(false);
@@ -35,6 +42,14 @@ export const PhotoListPage: React.FC = () => {
         setCurrentPage(1);
     };
 
+    const handleClearPhotoForm = () => {
+        setNewItemName('');
+        setNewItemAuthor('');
+        setNewItemFeatured(false);
+        setNewItemUrl('');
+        setNewItemAlbumId('');
+    }
+
     // Get target items from db
     const fetchItems = useCallback(async () => {
         const url = `${ApiUrls.getPhotos}`;
@@ -45,7 +60,7 @@ export const PhotoListPage: React.FC = () => {
         } catch (err) {
             setItems([]);
             setStatus('error');
-            setError('Failed to fetch items: ' + err);
+            setErrorMessage('Failed to fetch items: ' + err);
         }
     }, []);
 
@@ -91,39 +106,59 @@ export const PhotoListPage: React.FC = () => {
     // Add Item Handler
     const handleAddItem = async (e: React.FormEvent) => {
         e.preventDefault();
+        setErrorMessage(null);
         if (!newItemName.trim() || !newItemAuthor.trim()) return;
 
-        const newAlbum = albums.find((album) => String(album.id) === newItemAlbumId) || null;
-
-        const newItem: Photo = {
-            id: Date.now(),
+        const newItem: PhotoFormPayload = {
             name: newItemName,
-            author: newItemAuthor,
-            featured: newItemFeatured,
-            is_favorited: false,
             url: newItemUrl,
-            album_id: newItemAlbumId,
-            album: newAlbum,
-            album_name: newAlbum?.name ?? '',
-            album_author: newAlbum?.author ?? '',
-            size: '',
+            author: newItemAuthor,
+            album: newItemAlbumId,
+            featured: newItemFeatured,
         };
 
-        const response = await createPhoto(newItem);
-        if (response) {
-            setStatus('success');
-            setItems((prev) => [...prev, newItem]);
+        let response = false;
+        setLoading(true);
+        if (action === "create") {
+            response = await createPhoto(newItem);
         } else {
-            setStatus('error');
-            setError('Failed to create photo');
+            response = await updatePhoto(newItem, newItemId);
         }
 
-        // Reset Form Fields
-        setNewItemName('');
-        setNewItemAuthor('');
-        setNewItemFeatured(false);
-        setNewItemUrl('');
-        setNewItemAlbumId('');
+        if (response) {
+            await fetchItems();
+            setStatus('success');
+            if (action !== 'create') {
+                setAction('create');
+            }
+            // Reset Form Fields
+            handleClearPhotoForm();
+        } else {
+            setStatus('error');
+            setErrorMessage(
+                action === 'create' ? 'Failed to create photo' : 'Failed to update photo'
+            );
+        }
+
+        setLoading(false);
+    };
+
+    // Edit item handler
+    const handleEditItem = async (item: Photo) => {
+        // set data in new photo form
+        const albumId =
+            item.album_id ??
+            (typeof item.album === 'object' ? item.album?.id : item.album) ??
+            '';
+        setNewItemId(Number(item.id));
+        setNewItemName(item.name);
+        setNewItemAuthor(item.author);
+        setNewItemFeatured(item.featured);
+        setNewItemUrl(item.url);
+        setNewItemAlbumId(String(albumId));
+
+        // Change action state to update
+        setAction('update');
     };
 
     // Delete Item Handler
@@ -144,7 +179,7 @@ export const PhotoListPage: React.FC = () => {
             });
         } else {
             setStatus('error');
-            setError('Failed to delete item');
+            setErrorMessage('Failed to delete item');
         }
     };
 
@@ -153,8 +188,9 @@ export const PhotoListPage: React.FC = () => {
         setCurrentPage(1); // Reset to page 1 on limit change
     };
 
-    if (status === 'loading') return <p className="p-4">Loading items...</p>;
-    if (status === 'error') return <p className="p-4 text-danger">Error: {error}</p>;
+
+    (status === 'loading') && <Alert severity="info">Loading items...</Alert>;
+    { errorMessage && <Alert severity="error">{errorMessage}</Alert> }
     return (
         <div className="container py-4">
             <Card className="shadow-sm mb-4">
@@ -215,21 +251,26 @@ export const PhotoListPage: React.FC = () => {
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-                            <Col md={5}>
-                                <Form.Group className="mb-3 flex flex-row justify-left" controlId="itemFeatured">
-                                    <Form.Label>Featured</Form.Label>
+                            <Col md={5} className="d-flex align-items-center">
+                                <Form.Group className="d-flex align-items-center gap-2 mb-0 pb-2" controlId="itemFeatured">
                                     <Form.Check
-                                        className="ml-2"
                                         type="checkbox"
+                                        id="itemFeatured"
                                         name="featured"
+                                        label="Featured"
                                         checked={newItemFeatured}
                                         onChange={(e) => setNewItemFeatured(e.target.checked)}
                                     />
                                 </Form.Group>
                             </Col>
                             <Col md={3}>
-                                <Button variant="primary" type="submit" className="w-100">
-                                    + Add Item
+                                <Button variant="primary" type="submit" className="w-100" disabled={loading}>
+                                    {loading ? (
+                                        <>
+                                            <Spinner animation="border" size="sm" className="me-2" />
+                                            {`${action === 'create' ? 'Saving...' : 'Updating...'}`}
+                                        </>
+                                    ) : (`${action === 'create' ? 'Save' : 'Update'}`)}
                                 </Button>
                             </Col>
                         </Row>
@@ -318,6 +359,7 @@ export const PhotoListPage: React.FC = () => {
                                 <th>Name</th>
                                 <th>Author</th>
                                 <th>Album</th>
+                                <th>Featured</th>
                                 <th className="text-center" style={{ width: '120px' }}>
                                     Actions
                                 </th>
@@ -341,7 +383,16 @@ export const PhotoListPage: React.FC = () => {
                                                 albums.find((album) => String(album.id) === String(item.album))?.name ?? '—'
                                             }
                                         </td>
-                                        <td className="text-center">
+                                        <td className="w-20 text-center">{item.featured ? 'Yes' : 'No'}</td>
+                                        <td className="d-flex gap-2 justify-content-center">
+                                            <Button
+                                                variant="outline-primary"
+                                                size="sm"
+                                                onClick={() => handleEditItem(item)}
+                                                title="Edit Item"
+                                            >
+                                                Edit
+                                            </Button>
                                             <Button
                                                 variant="outline-danger"
                                                 size="sm"

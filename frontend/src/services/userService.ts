@@ -26,10 +26,17 @@ export async function deleteUser(userId: string | number): Promise<boolean> {
 }
 
 export async function updateUser(userData: User): Promise<boolean> {
-    const url = userData ? ApiUrls.updateUser : '';
+    const url = userData?.id
+        ? ApiUrls.updateUser.replace(':id', userData.id.toString())
+        : '';
+
+    const payload: Partial<User> = { ...userData };
+    if (!payload.password) {
+        delete payload.password;
+    }
 
     try {
-        await api.apiPut(url, userData);
+        await api.apiPatch(url, payload);
         return true;
     } catch (err) {
         console.log('Error updating user:', err);

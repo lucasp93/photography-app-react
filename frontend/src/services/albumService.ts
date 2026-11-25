@@ -15,7 +15,9 @@ export async function createAlbum(albumData: Album): Promise<boolean> {
 }
 
 export async function updateAlbum(albumData: Album): Promise<boolean> {
-    const url = albumData ? ApiUrls.updateAlbum : '';
+    const url = albumData?.id
+        ? ApiUrls.updateAlbum.replace(':id', albumData.id.toString())
+        : '';
 
     try {
         await api.apiPut(url, albumData);
