@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: lucasp93/photography-react-app:latest
+    image: lucasp93/photography-react-app:${TAG:-latest}
     env_file:
       - ./backend/.env
     environment:
@@ -35,7 +35,7 @@ services:
         condition: service_started
 
   celery:
-    image: lucasp93/photography-react-app:latest
+    image: lucasp93/photography-react-app:${TAG:-latest}
     env_file:
       - ./backend/.env
     environment:
