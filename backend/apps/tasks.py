@@ -18,13 +18,21 @@ def send_order_confirmation_email(self, order_id):
     """
     try:
         order = Order.objects.get(pk=order_id)
+        photos = list(order.photos.select_related("album").all())
+
+        photos_text = "\n".join(
+            f"- {photo.name} ({photo.size})"
+            + (f" — {photo.album.name} by {photo.album.author}" if photo.album else "")
+            for photo in photos
+        ) or "No photos attached."
 
         subject = f"Order Confirmation - {order.order_number}"
         text_context = (
             f"Hi {order.client_name},\n\n"
             f"Thank you for your order!\n"
             f"Order number: {order.order_number}\n"
-            f"Total price: ${order.price}\n"
+            f"Total price: ${order.price}\n\n"
+            f"Ordered photos:\n{photos_text}\n\n"
             f"We will process it shortly."
         )
         recipient_list = [order.client_email]
@@ -34,7 +42,7 @@ def send_order_confirmation_email(self, order_id):
             "emails/order_confirmation.html",
             {
                 "order": order,
-                "photos": order.photos.select_related("album").all(),
+                "photos": photos,
             },
         )
         email = EmailMultiAlternatives(
